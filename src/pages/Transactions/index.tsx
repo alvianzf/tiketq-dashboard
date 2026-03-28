@@ -113,7 +113,7 @@ const TransactionsPage = () => {
                       day: 'numeric'
                     })}
                   </TableCell>
-                  <TableCell className="font-bold text-white text-lg">${transaction.totalSales}</TableCell>
+                  <TableCell className="font-bold text-white">Rp {Number(transaction.totalSales).toLocaleString('id-ID')}</TableCell>
                   <TableCell>
                     <Chip 
                       className="capitalize border-none px-3 h-7 font-bold text-[10px]" 

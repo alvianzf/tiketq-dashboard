@@ -1,32 +1,52 @@
 import { Card, CardBody, Progress, Chip } from "@nextui-org/react";
-import { Activity, ShieldCheck, Cpu, HardDrive, Clock } from "lucide-react";
+import { Activity, Cpu, HardDrive, Clock, CheckCircle, AlertCircle } from "lucide-react";
 import { useHealth } from "../hooks/useAdmin";
 
 const SystemHealth = () => {
   const { data: health, isLoading } = useHealth();
 
-  if (isLoading) return null;
+  if (isLoading) return (
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {[...Array(4)].map((_, i) => (
+        <Card key={i} className="bg-white/5 border border-white/10 backdrop-blur-2xl animate-pulse">
+          <CardBody className="p-6 h-[120px]" />
+        </Card>
+      ))}
+    </div>
+  );
+
+  const isOnline = health?.status === "Online";
+  const cpuPercent = health?.system?.cpuPercent ?? parseInt(health?.system?.cpu || "0");
+  const memPercent = health?.system?.memPercent ?? 0;
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      <Card className="bg-zinc-900/40 border-white/5 backdrop-blur-md">
+      {/* Status Card */}
+      <Card className={`border backdrop-blur-2xl shadow-xl ${isOnline ? "bg-green-500/5 border-green-500/20" : "bg-red-500/5 border-red-500/20"}`}>
         <CardBody className="p-6 gap-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-zinc-400">
-              <Activity size={18} />
-              <span className="text-sm font-medium">System Status</span>
+            <div className="flex items-center gap-2">
+              <Activity size={18} className={isOnline ? "text-green-400" : "text-red-400"} />
+              <span className="text-sm font-medium text-zinc-400">System Status</span>
             </div>
-            <Chip color="success" variant="flat" size="sm" className="bg-green-500/10 text-green-400 border-none">
-              {health?.status}
+            <Chip
+              size="sm"
+              variant="flat"
+              className={isOnline ? "bg-green-500/10 text-green-400 border-none" : "bg-red-500/10 text-red-400 border-none"}
+            >
+              {health?.status || "Unknown"}
             </Chip>
           </div>
-          <div className="space-y-3">
-            {health?.services.map((service, i) => (
+          <div className="space-y-2.5">
+            {health?.services?.map((service, i) => (
               <div key={i} className="flex items-center justify-between text-xs">
                 <span className="text-zinc-500">{service.name}</span>
                 <div className="flex items-center gap-2">
                   <span className="text-zinc-600 font-mono">{service.latency}</span>
-                  <div className={`w-1.5 h-1.5 rounded-full ${service.status === 'Healthy' ? 'bg-green-400 shadow-[0_0_8px_#4ade80]' : 'bg-red-400 shadow-[0_0_8px_#f87171]'}`} />
+                  {service.status === "Healthy"
+                    ? <CheckCircle size={12} className="text-green-400" />
+                    : <AlertCircle size={12} className="text-red-400" />
+                  }
                 </div>
               </div>
             ))}
@@ -34,50 +54,63 @@ const SystemHealth = () => {
         </CardBody>
       </Card>
 
-      <Card className="bg-zinc-900/40 border-white/5 backdrop-blur-md">
+      {/* CPU Card */}
+      <Card className="bg-white/5 border border-white/10 backdrop-blur-2xl shadow-xl">
         <CardBody className="p-6 gap-4">
           <div className="flex items-center gap-2 text-zinc-400">
             <Cpu size={18} />
-            <span className="text-sm font-medium">CPU Usage</span>
+            <span className="text-sm font-medium">CPU Load</span>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="text-zinc-500">Node Cluster</span>
-              <span className="text-white font-bold">{health?.system.cpu}</span>
+              <span className="text-zinc-500">1-min avg</span>
+              <span className="text-white font-bold">{health?.system?.cpu || "—"}</span>
             </div>
-            <Progress size="sm" value={parseInt(health?.system.cpu || '0')} color="primary" className="max-w-md" />
+            <Progress
+              size="sm"
+              value={cpuPercent}
+              color={cpuPercent > 80 ? "danger" : cpuPercent > 50 ? "warning" : "primary"}
+              className="max-w-md"
+            />
           </div>
         </CardBody>
       </Card>
 
-      <Card className="bg-zinc-900/40 border-white/5 backdrop-blur-md">
+      {/* Memory Card */}
+      <Card className="bg-white/5 border border-white/10 backdrop-blur-2xl shadow-xl">
         <CardBody className="p-6 gap-4">
           <div className="flex items-center gap-2 text-zinc-400">
             <HardDrive size={18} />
-            <span className="text-sm font-medium">Memory Allocation</span>
+            <span className="text-sm font-medium">Memory</span>
           </div>
           <div className="space-y-2">
             <div className="flex justify-between text-xs">
-              <span className="text-zinc-500">{health?.system.memory} used</span>
-              <span className="text-white font-bold">30%</span>
+              <span className="text-zinc-500 truncate">{health?.system?.memory || "—"}</span>
+              <span className="text-white font-bold ml-2">{memPercent > 0 ? `${memPercent}%` : ""}</span>
             </div>
-            <Progress size="sm" value={30} color="secondary" className="max-w-md" />
+            <Progress
+              size="sm"
+              value={memPercent}
+              color={memPercent > 85 ? "danger" : memPercent > 65 ? "warning" : "secondary"}
+              className="max-w-md"
+            />
           </div>
         </CardBody>
       </Card>
 
-      <Card className="bg-zinc-900/40 border-white/5 backdrop-blur-md">
+      {/* Uptime Card */}
+      <Card className="bg-white/5 border border-white/10 backdrop-blur-2xl shadow-xl">
         <CardBody className="p-6 gap-4">
           <div className="flex items-center gap-2 text-zinc-400">
             <Clock size={18} />
             <span className="text-sm font-medium">Server Uptime</span>
           </div>
-          <div className="text-2xl font-bold text-white">
-            {health?.system?.uptime || 'N/A'}
+          <div className="text-2xl font-bold text-white tracking-tight">
+            {health?.system?.uptime || "—"}
           </div>
           <div className="text-xs text-zinc-500 flex items-center gap-1">
-            <ShieldCheck size={12} className="text-green-500" />
-            Security patches up to date
+            <div className="w-1.5 h-1.5 rounded-full bg-green-400 shadow-[0_0_6px_#4ade80]" />
+            Process running
           </div>
         </CardBody>
       </Card>

@@ -32,11 +32,15 @@ const DashboardPage = () => {
     );
   }
 
+  const successRate = statsData && statsData.totalTransactions > 0
+    ? `${((statsData.successfulTransactions / statsData.totalTransactions) * 100).toFixed(1)}% success rate`
+    : "—";
+
   const stats = [
-    { title: "Total Revenue", value: `$${statsData?.totalRevenue?.toLocaleString() || '0'}`, change: statsData?.growth || "+0%", trend: "up", icon: CreditCard, color: "text-blue-500" },
-    { title: "Successful txns", value: statsData?.successfulTransactions?.toString() || '0', change: "+18.1%", trend: "up", icon: Users, color: "text-[#00D5FF]" },
-    { title: "Total Bookings", value: statsData?.totalTransactions?.toString() || '0', change: "+19%", trend: "up", icon: TrendingUp, color: "text-green-500" },
-    { title: "Available Cars", value: statsData?.activeCars?.toString() || '0', change: "-0%", trend: "down", icon: Car, color: "text-orange-500" },
+    { title: "Total Revenue", value: `Rp ${Number(statsData?.totalRevenue || 0).toLocaleString('id-ID')}`, change: statsData?.growth || "—", trend: "up", icon: CreditCard, color: "text-blue-500" },
+    { title: "Successful Txns", value: statsData?.successfulTransactions?.toString() || '0', change: successRate, trend: "up", icon: Users, color: "text-[#00D5FF]" },
+    { title: "Total Bookings", value: statsData?.totalTransactions?.toString() || '0', change: "all time", trend: "up", icon: TrendingUp, color: "text-green-500" },
+    { title: "Available Cars", value: statsData?.activeCars?.toString() || '0', change: "in fleet", trend: "up", icon: Car, color: "text-orange-500" },
   ];
 
   const chartData = statsData?.chartData || [];

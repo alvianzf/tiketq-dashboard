@@ -33,7 +33,7 @@ const AnalyticsPage = () => {
   const summaryCards = [
     {
       label: "Total Revenue",
-      value: `$${statsData?.totalRevenue?.toLocaleString() || "0"}`,
+      value: `Rp ${Number(statsData?.totalRevenue || 0).toLocaleString("id-ID")}`,
       icon: DollarSign,
       color: "text-[#00D5FF]",
       bg: "bg-[#00D5FF]/10",
@@ -99,6 +99,7 @@ const AnalyticsPage = () => {
                       cursor={{ fill: '#ffffff05' }}
                       contentStyle={{ backgroundColor: 'rgba(24,24,27,0.9)', backdropFilter: 'blur(16px)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '12px' }}
                       itemStyle={{ color: '#fff' }}
+                      formatter={(value: any) => [`Rp ${Number(value).toLocaleString("id-ID")}`, "Revenue"]}
                     />
                     <Bar dataKey="total" fill="#4267B2" radius={[6, 6, 0, 0]} />
                   </BarChart>

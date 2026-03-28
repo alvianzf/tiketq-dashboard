@@ -26,7 +26,7 @@ export interface Stats {
 export interface Health {
   status: string;
   services: { name: string; status: string; latency: string }[];
-  system: { cpu: string; memory: string; uptime: string };
+  system: { cpu: string; memory: string; uptime: string; cpuPercent?: number; memPercent?: number };
 }
 
 export interface Car {
