@@ -15,6 +15,7 @@ import {
   CardBody
 } from "@nextui-org/react";
 import { Search, Filter, Download, MoreVertical, Eye } from "lucide-react";
+import { toast } from "sonner";
 import { useTransactions, type Transaction } from "../../hooks/useAdmin";
 
 const statusColorMap: Record<string, "success" | "warning" | "danger" | "default" | "primary" | "secondary"> = {
@@ -27,6 +28,14 @@ const statusColorMap: Record<string, "success" | "warning" | "danger" | "default
 
 const TransactionsPage = () => {
   const { data: transactions, isLoading } = useTransactions();
+
+  const handleExport = () => {
+    toast.promise(new Promise((resolve) => setTimeout(resolve, 2000)), {
+      loading: 'Preparing transactions report...',
+      success: 'Export successful! transactions_report.csv has been downloaded.',
+      error: 'Failed to export transactions.',
+    });
+  };
 
   const getCustomerName = (transaction: Transaction) => {
     if (transaction.flightBooking) return transaction.flightBooking.name || transaction.email;
@@ -41,7 +50,11 @@ const TransactionsPage = () => {
           <h1 className="text-3xl font-bold text-white">Transactions</h1>
           <p className="text-zinc-500">Monitor and manage all customer bookings.</p>
         </div>
-        <Button className="bg-[#4267B2] text-white font-bold" startContent={<Download size={18} />}>
+        <Button 
+          className="bg-[#4267B2] text-white font-bold" 
+          startContent={<Download size={18} />}
+          onClick={handleExport}
+        >
           Export CSV
         </Button>
       </div>

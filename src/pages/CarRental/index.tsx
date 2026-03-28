@@ -45,15 +45,33 @@ const INPUT_CLASSES = {
 const CarRentalPage = () => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const { data: cars, isLoading } = useCars();
-  const { createCar, deleteCar } = useCarMutation();
+  const { createCar, updateCar, deleteCar } = useCarMutation();
   const [search, setSearch] = useState("");
+  const [editingCar, setEditingCar] = useState<Car | null>(null);
 
-  const [newCar, setNewCar] = useState({
+  const [formState, setFormState] = useState({
     name: "",
     type: "SUV",
     pricePerDay: 500000,
     rows: 3,
   });
+
+  const handleOpenAdd = () => {
+    setEditingCar(null);
+    setFormState({ name: "", type: "SUV", pricePerDay: 500000, rows: 3 });
+    onOpen();
+  };
+
+  const handleOpenEdit = (car: Car) => {
+    setEditingCar(car);
+    setFormState({
+      name: car.name,
+      type: car.type,
+      pricePerDay: car.pricePerDay,
+      rows: car.rows,
+    });
+    onOpen();
+  };
 
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to remove this car from inventory?")) {
@@ -64,17 +82,25 @@ const CarRentalPage = () => {
     }
   };
 
-  const handleCreate = async () => {
-    if (!newCar.name.trim()) return toast.error("Validation Error", { description: "Car Name is required." });
-    if (!newCar.type) return toast.error("Validation Error", { description: "Car Type is required." });
-    if (newCar.pricePerDay <= 0) return toast.error("Validation Error", { description: "Price per day must be greater than 0." });
-    if (newCar.rows <= 0) return toast.error("Validation Error", { description: "Number of rows must be greater than 0." });
+  const handleSubmit = async () => {
+    if (!formState.name.trim()) return toast.error("Validation Error", { description: "Car Name is required." });
+    if (!formState.type) return toast.error("Validation Error", { description: "Car Type is required." });
+    if (formState.pricePerDay <= 0) return toast.error("Validation Error", { description: "Price per day must be greater than 0." });
+    if (formState.rows <= 0) return toast.error("Validation Error", { description: "Number of rows must be greater than 0." });
     
-    await createCar.mutateAsync({ ...newCar, available: true });
-    toast.success("Vehicle added", {
-      description: `${newCar.name} has been added to your inventory.`,
-    });
-    setNewCar({ name: "", type: "SUV", pricePerDay: 500000, rows: 3 });
+    if (editingCar) {
+      await updateCar.mutateAsync({ id: editingCar.id, data: formState });
+      toast.success("Vehicle updated", {
+        description: `${formState.name} has been successfully updated.`,
+      });
+    } else {
+      await createCar.mutateAsync({ ...formState, available: true });
+      toast.success("Vehicle added", {
+        description: `${formState.name} has been added to your inventory.`,
+      });
+    }
+    
+    setFormState({ name: "", type: "SUV", pricePerDay: 500000, rows: 3 });
     onClose();
   };
 
@@ -91,7 +117,7 @@ const CarRentalPage = () => {
           <p className="text-zinc-500">Manage your fleet, pricing, and availability.</p>
         </div>
         <Button
-          onPress={onOpen}
+          onPress={handleOpenAdd}
           variant="shadow"
           startContent={<Plus size={18} />}
           className="bg-blue-600 text-white font-bold h-12 px-6 shadow-blue-600/20"
@@ -181,7 +207,11 @@ const CarRentalPage = () => {
                   <TableCell>
                     <div className="flex items-center justify-center gap-2">
                       <Tooltip content="Edit car" showArrow>
-                        <Button isIconOnly size="sm" variant="flat" className="bg-white/5 text-zinc-400 hover:text-amber-400 hover:bg-amber-500/10 border border-white/5">
+                        <Button 
+                          isIconOnly size="sm" variant="flat" 
+                          className="bg-white/5 text-zinc-400 hover:text-amber-400 hover:bg-amber-500/10 border border-white/5"
+                          onPress={() => handleOpenEdit(car)}
+                        >
                           <Edit2 size={15} />
                         </Button>
                       </Tooltip>
@@ -221,8 +251,8 @@ const CarRentalPage = () => {
                     <CarIcon size={20} className="text-blue-400" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white">Add New Car</h2>
-                    <p className="text-sm text-zinc-500 font-normal mt-0.5">Fill in the vehicle details below.</p>
+                    <h2 className="text-xl font-bold text-white">{editingCar ? "Edit Vehicle" : "Add New Car"}</h2>
+                    <p className="text-sm text-zinc-500 font-normal mt-0.5">{editingCar ? "Update the vehicle information." : "Fill in the vehicle details below."}</p>
                   </div>
                 </div>
               </ModalHeader>
@@ -234,8 +264,8 @@ const CarRentalPage = () => {
                     placeholder="e.g. Toyota Avanza"
                     variant="bordered"
                     classNames={INPUT_CLASSES}
-                    value={newCar.name}
-                    onValueChange={(v) => setNewCar((p) => ({ ...p, name: v }))}
+                    value={formState.name}
+                    onValueChange={(v) => setFormState((p) => ({ ...p, name: v }))}
                   />
                   <Select
                     label="Car Type"
@@ -256,8 +286,8 @@ const CarRentalPage = () => {
                         base: "text-white data-[hover=true]:bg-white/10 data-[selectable=true]:focus:bg-white/10",
                       }
                     }}
-                    selectedKeys={newCar.type ? [newCar.type] : []}
-                    onSelectionChange={(v) => setNewCar((p) => ({ ...p, type: Array.from(v)[0] as string || p.type }))}
+                    selectedKeys={formState.type ? [formState.type] : []}
+                    onSelectionChange={(v) => setFormState((p) => ({ ...p, type: Array.from(v)[0] as string || p.type }))}
                   >
                     {carTypes.map((type) => (
                       <SelectItem key={type}>{type}</SelectItem>
@@ -272,9 +302,9 @@ const CarRentalPage = () => {
                     type="number"
                     variant="bordered"
                     classNames={INPUT_CLASSES}
-                    value={newCar.pricePerDay.toString()}
-                    onValueChange={(v) => setNewCar((p) => ({ ...p, pricePerDay: Number(v) }))}
-                    description={newCar.pricePerDay > 0 ? `Rp ${Number(newCar.pricePerDay).toLocaleString("id-ID")}` : ""}
+                    value={formState.pricePerDay.toString()}
+                    onValueChange={(v) => setFormState((p) => ({ ...p, pricePerDay: Number(v) }))}
+                    description={formState.pricePerDay > 0 ? `Rp ${Number(formState.pricePerDay).toLocaleString("id-ID")}` : ""}
                   />
                   <Input
                     label="Number of Seat Rows"
@@ -282,8 +312,8 @@ const CarRentalPage = () => {
                     type="number"
                     variant="bordered"
                     classNames={INPUT_CLASSES}
-                    value={newCar.rows.toString()}
-                    onValueChange={(v) => setNewCar((p) => ({ ...p, rows: Number(v) }))}
+                    value={formState.rows.toString()}
+                    onValueChange={(v) => setFormState((p) => ({ ...p, rows: Number(v) }))}
                   />
                 </div>
               </ModalBody>
@@ -294,10 +324,10 @@ const CarRentalPage = () => {
                 </Button>
                 <Button
                   className="bg-blue-600 text-white font-bold shadow-lg shadow-blue-600/20 flex-1 h-11"
-                  onPress={handleCreate}
-                  isLoading={createCar.isPending}
+                  onPress={handleSubmit}
+                  isLoading={createCar.isPending || updateCar.isPending}
                 >
-                  Add to Inventory
+                  {editingCar ? "Save Changes" : "Add to Inventory"}
                 </Button>
               </ModalFooter>
             </>

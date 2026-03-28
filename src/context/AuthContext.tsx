@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { toast } from "sonner";
 import AuthService, { type User } from "../services/AuthService";
 
 interface AuthContextType {
@@ -40,6 +41,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const logout = () => {
     AuthService.logout();
     setUser(null);
+    toast.info("Signed out", {
+      description: "You have been successfully logged out of the admin dashboard.",
+    });
   };
 
   return (
