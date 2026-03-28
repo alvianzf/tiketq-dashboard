@@ -10,7 +10,9 @@ import {
   Tooltip, 
   Button,
   Input,
-  Spinner
+  Spinner,
+  Card,
+  CardBody
 } from "@nextui-org/react";
 import { Search, Filter, Download, MoreVertical, Eye } from "lucide-react";
 import { useTransactions, type Transaction } from "../../hooks/useAdmin.ts";
@@ -44,81 +46,104 @@ const TransactionsPage = () => {
         </Button>
       </div>
 
-      <div className="flex items-center gap-4 bg-zinc-900/50 p-4 rounded-2xl border border-white/5 backdrop-blur-md">
+      <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-2xl shadow-xl">
         <Input
           placeholder="Search transactions..."
           startContent={<Search className="text-zinc-500" size={18} />}
           className="max-w-md"
-          variant="flat"
+          variant="bordered"
+          classNames={{
+            input: "text-white",
+            inputWrapper: "border-white/5 hover:border-white/10 focus-within:!border-blue-500/50 bg-white/5",
+          }}
         />
-        <Button variant="flat" startContent={<Filter size={18} />}>Filter</Button>
+        <Button variant="flat" className="bg-white/5 border border-white/10 text-zinc-300" startContent={<Filter size={18} />}>Filter</Button>
       </div>
 
-      <Table 
-        aria-label="Transactions table"
-        className="bg-zinc-900/50 rounded-2xl border border-white/5 overflow-hidden"
-        classNames={{
-          base: "max-h-[700px] overflow-scroll",
-          table: "min-h-[400px]",
-          thead: "bg-zinc-800/50",
-          th: "text-zinc-400 font-bold border-b border-white/5 py-4",
-          td: "py-4 text-zinc-300",
-        }}
-      >
-        <TableHeader>
-          <TableColumn>CUSTOMER</TableColumn>
-          <TableColumn>TYPE</TableColumn>
-          <TableColumn>DATE</TableColumn>
-          <TableColumn>AMOUNT</TableColumn>
-          <TableColumn>STATUS</TableColumn>
-          <TableColumn align="center">ACTIONS</TableColumn>
-        </TableHeader>
-        <TableBody 
-          emptyContent={isLoading ? <Spinner /> : "No transactions found"}
-          items={transactions || []}
-        >
-          {(transaction: Transaction) => (
-            <TableRow key={transaction.id} className="hover:bg-white/5 transition-colors">
-              <TableCell>
-                <User
-                  name={getCustomerName(transaction)}
-                  description={transaction.email}
-                  avatarProps={{
-                    src: `https://i.pravatar.cc/150?u=${transaction.id}`,
-                    className: "border-2 border-[#4267B2]/30"
-                  }}
-                  classNames={{
-                    name: "text-white font-medium",
-                    description: "text-zinc-500"
-                  }}
-                />
-              </TableCell>
-              <TableCell className="font-medium text-zinc-200 capitalize">{transaction.serviceType.replace('_', ' ')}</TableCell>
-              <TableCell className="text-zinc-400">{new Date(transaction.createdAt).toLocaleDateString()}</TableCell>
-              <TableCell className="font-bold text-white">${transaction.totalSales}</TableCell>
-              <TableCell>
-                <Chip className="capitalize border-none gap-1" color={statusColorMap[transaction.status] || "default"} size="sm" variant="flat">
-                  {transaction.status}
-                </Chip>
-              </TableCell>
-              <TableCell>
-                <div className="relative flex items-center justify-center gap-2">
-                  <Tooltip content="Details">
-                    <span className="text-lg text-zinc-400 cursor-pointer active:opacity-50 hover:text-[#00D5FF] transition-colors">
-                      <Eye size={18} />
-                    </span>
-                  </Tooltip>
-                  <Tooltip content="Action">
-                    <span className="text-lg text-zinc-400 cursor-pointer active:opacity-50 hover:text-white transition-colors">
-                      <MoreVertical size={18} />
-                    </span>
-                  </Tooltip>
-                </div>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+      <Card className="bg-white/5 border-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden">
+        <CardBody className="p-0">
+          <Table 
+            aria-label="Transactions table"
+            removeWrapper
+            classNames={{
+              base: "max-h-[700px] overflow-scroll",
+              table: "min-h-[400px]",
+              th: "bg-white/5 text-zinc-400 font-bold border-b border-white/5 py-5",
+              td: "py-4 text-zinc-300 border-b border-white/5",
+            }}
+          >
+            <TableHeader>
+              <TableColumn>CUSTOMER</TableColumn>
+              <TableColumn>TYPE</TableColumn>
+              <TableColumn>DATE</TableColumn>
+              <TableColumn>AMOUNT</TableColumn>
+              <TableColumn>STATUS</TableColumn>
+              <TableColumn align="center">ACTIONS</TableColumn>
+            </TableHeader>
+            <TableBody 
+              emptyContent={isLoading ? <Spinner color="primary" /> : "No transactions found"}
+              items={transactions || []}
+            >
+              {(transaction: Transaction) => (
+                <TableRow key={transaction.id} className="hover:bg-white/5 transition-colors group">
+                  <TableCell>
+                    <User
+                      name={getCustomerName(transaction)}
+                      description={transaction.email}
+                      avatarProps={{
+                        src: `https://api.dicebear.com/7.x/avataaars/svg?seed=${transaction.id}&backgroundColor=b6e3f4`,
+                        className: "border border-white/10 shadow-lg"
+                      }}
+                      classNames={{
+                        name: "text-white font-semibold",
+                        description: "text-zinc-500"
+                      }}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-blue-500/50" />
+                      <span className="font-medium text-zinc-200 capitalize">{transaction.serviceType.replace('_', ' ')}</span>
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-zinc-400 text-sm">
+                    {new Date(transaction.createdAt).toLocaleDateString(undefined, {
+                      year: 'numeric',
+                      month: 'short',
+                      day: 'numeric'
+                    })}
+                  </TableCell>
+                  <TableCell className="font-bold text-white text-lg">${transaction.totalSales}</TableCell>
+                  <TableCell>
+                    <Chip 
+                      className="capitalize border-none px-3 h-7 font-bold text-[10px]" 
+                      color={statusColorMap[transaction.status] || "default"} 
+                      size="sm" 
+                      variant="flat"
+                    >
+                      {transaction.status}
+                    </Chip>
+                  </TableCell>
+                  <TableCell>
+                    <div className="relative flex items-center justify-center gap-3">
+                      <Tooltip content="Quick View" showArrow>
+                        <button className="p-2 rounded-lg bg-white/5 hover:bg-blue-500/10 text-zinc-400 hover:text-blue-500 transition-all border border-white/5">
+                          <Eye size={16} />
+                        </button>
+                      </Tooltip>
+                      <Tooltip content="Manage" showArrow>
+                        <button className="p-2 rounded-lg bg-white/5 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all border border-white/5">
+                          <MoreVertical size={16} />
+                        </button>
+                      </Tooltip>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </CardBody>
+      </Card>
     </div>
   );
 };

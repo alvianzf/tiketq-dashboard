@@ -1,5 +1,6 @@
 import axios from "axios";
-import type { Car, Transaction, Stats } from "../hooks/useAdmin.ts";
+import type { Car, Transaction, Stats } from "../hooks/useAdmin";
+import type { User as AuthUser } from "../services/AuthService";
 
 interface AppResponse<T> {
   message: string;
@@ -10,7 +11,14 @@ const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
 });
 
-export default api;
+// Auth Interceptor
+api.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 export const adminService = {
   getTransactions: async (): Promise<Transaction[]> => {
@@ -21,20 +29,43 @@ export const adminService = {
     const { data } = await api.get<AppResponse<Stats>>("/admin/stats");
     return data.data;
   },
+  getHealth: async (): Promise<Record<string, unknown>> => {
+    const { data } = await api.get("/health"); // Pointing to core health check as requested
+    return data;
+  },
+  
+  // User Management
+  getUsers: async (): Promise<AuthUser[]> => {
+    const { data } = await api.get<AppResponse<AuthUser[]>>("/admin/users");
+    return data.data;
+  },
+  registerUser: async (userData: Record<string, unknown>) => {
+    const { data } = await api.post<AppResponse<AuthUser>>("/admin/users/register", userData);
+    return data.data;
+  },
+  updateUser: async (id: number, userData: Record<string, unknown>) => {
+    const { data } = await api.put<AppResponse<AuthUser>>(`/admin/users/${id}`, userData);
+    return data.data;
+  },
+  deleteUser: async (id: number) => {
+    const { data } = await api.delete<AppResponse<void>>(`/admin/users/${id}`);
+    return data.data;
+  },
+
   getCars: async () => {
     const { data } = await api.get("/car-rental/cars");
     return data.data;
   },
-  createCar: async (carData: Partial<Car>): Promise<Car> => {
-    const { data } = await api.post<AppResponse<Car>>("/car-rental/cars", carData);
+  createCar: async (carData: Partial<Car>) => {
+    const { data } = await api.post("/car-rental/cars", carData);
     return data.data;
   },
-  updateCar: async (id: number, carData: Partial<Car>): Promise<Car> => {
-    const { data } = await api.put<AppResponse<Car>>(`/car-rental/cars/${id}`, carData);
+  updateCar: async (id: number, carData: Partial<Car>) => {
+    const { data } = await api.put(`/car-rental/cars/${id}`, carData);
     return data.data;
   },
   deleteCar: async (id: number) => {
     const { data } = await api.delete(`/car-rental/cars/${id}`);
     return data.data;
-  }
+  },
 };

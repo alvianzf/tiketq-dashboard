@@ -19,6 +19,14 @@ export interface Stats {
   totalRevenue: number;
   activeCars: number;
   growth: string;
+  chartData: { name: string; total: number }[];
+  serviceDistribution: { name: string; value: number; color: string }[];
+}
+
+export interface Health {
+  status: string;
+  services: { name: string; status: string; latency: string }[];
+  system: { cpu: string; memory: string; uptime: string };
 }
 
 export interface Car {
@@ -42,6 +50,14 @@ export const useStats = () => {
   return useQuery({
     queryKey: ["stats"],
     queryFn: adminService.getStats,
+  });
+};
+
+export const useHealth = () => {
+  return useQuery({
+    queryKey: ["health"],
+    queryFn: adminService.getHealth,
+    refetchInterval: 5000, // Refresh every 5s for health monitoring
   });
 };
 
