@@ -1,5 +1,5 @@
 import axios from "axios";
-import type { Car, Transaction, Stats } from "../hooks/useAdmin";
+import type { Car, Transaction, Stats, Health } from "../hooks/useAdmin";
 import type { User as AuthUser } from "../services/AuthService";
 
 interface AppResponse<T> {
@@ -29,9 +29,9 @@ export const adminService = {
     const { data } = await api.get<AppResponse<Stats>>("/admin/stats");
     return data.data;
   },
-  getHealth: async (): Promise<Record<string, unknown>> => {
-    const { data } = await api.get("/health"); // Pointing to core health check as requested
-    return data;
+  getHealth: async (): Promise<Health> => {
+    const { data } = await api.get<AppResponse<Health>>("/admin/health");
+    return data.data;
   },
   
   // User Management

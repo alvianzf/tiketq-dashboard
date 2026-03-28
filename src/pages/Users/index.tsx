@@ -21,7 +21,7 @@ import {
   Input,
   Spinner
 } from "@nextui-org/react";
-import { UserPlus, Shield, Trash2, Edit3, Key } from "lucide-react";
+import { UserPlus, Shield, Trash2, Edit3, Key, User as UserIcon } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminService } from "../../services/api.ts";
 
@@ -182,7 +182,7 @@ const UsersPage = () => {
                   variant="bordered"
                   value={username}
                   onValueChange={setUsername}
-                  startContent={<User size={18} className="text-zinc-400" />}
+                  startContent={<UserIcon size={18} className="text-zinc-400" />}
                   classNames={{
                     label: "text-zinc-400",
                     input: "text-white",

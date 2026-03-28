@@ -73,7 +73,7 @@ const SystemHealth = () => {
             <span className="text-sm font-medium">Server Uptime</span>
           </div>
           <div className="text-2xl font-bold text-white">
-            {health?.system.uptime}
+            {health?.system?.uptime || 'N/A'}
           </div>
           <div className="text-xs text-zinc-500 flex items-center gap-1">
             <ShieldCheck size={12} className="text-green-500" />
