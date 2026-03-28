@@ -37,7 +37,7 @@ const MODAL_CLASSES = {
 };
 
 const INPUT_CLASSES = {
-  label: "text-zinc-400 font-medium pb-1.5",
+  label: "text-zinc-400 font-medium pb-2",
   input: "text-white",
   inputWrapper: "border-white/10 hover:border-white/20 focus-within:!border-blue-500/60 bg-white/5",
 };

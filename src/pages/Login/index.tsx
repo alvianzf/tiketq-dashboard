@@ -24,7 +24,7 @@ const LoginPage = () => {
         description: "You have successfully logged into the admin dashboard.",
       });
       navigate("/");
-    } catch (err: any) {
+    } catch (err: unknown) {
       // Error handled by global interceptor, but we can add specific logic here if needed
       console.error("Login failed", err);
     } finally {
@@ -57,7 +57,7 @@ const LoginPage = () => {
               onValueChange={setUsername}
               startContent={<User size={18} className="text-zinc-400" />}
               classNames={{
-                label: "text-zinc-400",
+                label: "text-zinc-400 pb-2",
                 input: "text-white",
                 inputWrapper: "border-white/10 hover:border-white/20 focus-within:!border-blue-500/50 bg-white/5",
               }}
@@ -81,7 +81,7 @@ const LoginPage = () => {
                 </button>
               }
               classNames={{
-                label: "text-zinc-400",
+                label: "text-zinc-400 pb-2",
                 input: "text-white",
                 inputWrapper: "border-white/10 hover:border-white/20 focus-within:!border-blue-500/50 bg-white/5",
               }}
