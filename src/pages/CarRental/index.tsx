@@ -28,6 +28,7 @@ import { toast } from "sonner";
 import ReactQuill from 'react-quill-new';
 import 'react-quill-new/dist/quill.snow.css';
 import { useCars, useCarMutation, type Car } from "../../hooks/useAdmin";
+import { confirmDelete } from "../../utils/swal";
 
 const carTypes = ["City Car", "Sedan", "SUV", "MPV", "Minibus", "Pick-up", "Double Cabin", "Van"];
 
@@ -105,18 +106,24 @@ const CarRentalPage = () => {
   };
 
   const handleDeletePhoto = async (photoId: number) => {
-    if (window.confirm("Remove this photo permanently?")) {
+    const result = await confirmDelete(
+      "Delete Photo?",
+      "This photo will be permanently removed from the vehicle gallery."
+    );
+    if (result.isConfirmed) {
       await deletePhoto.mutateAsync(photoId);
       toast.success("Photo deleted");
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (window.confirm("Are you sure you want to remove this car from inventory?")) {
+    const result = await confirmDelete(
+      "Delete Vehicle?",
+      "Are you sure you want to delete this vehicle? This action cannot be undone."
+    );
+    if (result.isConfirmed) {
       await deleteCar.mutateAsync(id);
-      toast.success("Vehicle removed", {
-        description: "The car has been successfully removed from the inventory.",
-      });
+      toast.success("Vehicle deleted");
     }
   };
 

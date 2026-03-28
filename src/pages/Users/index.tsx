@@ -26,6 +26,7 @@ import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminService } from "../../services/api";
 import type { User as UserType } from "../../services/AuthService";
+import { confirmDelete } from "../../utils/swal";
 
 // Separate modal components for Add and Edit
 const AddUserModal = ({
@@ -275,8 +276,12 @@ const UsersPage = () => {
     },
   });
 
-  const handleDelete = (id: number) => {
-    if (window.confirm("Are you sure you want to delete this administrator? This action cannot be undone.")) {
+  const handleDelete = async (id: number) => {
+    const result = await confirmDelete(
+      "Remove Administrator?",
+      "Are you sure you want to delete this administrator? This action cannot be undone."
+    );
+    if (result.isConfirmed) {
       deleteMutation.mutate(id);
     }
   };
