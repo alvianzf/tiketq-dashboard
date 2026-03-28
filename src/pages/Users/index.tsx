@@ -91,7 +91,7 @@ const AddUserModal = ({
                 onValueChange={setUsername}
                 startContent={<UserIcon size={16} className="text-zinc-500" />}
                 classNames={{
-                  label: "text-zinc-400 font-medium pb-2",
+                  label: "text-zinc-400 font-medium pb-3",
                   input: "text-white",
                   inputWrapper: "border-white/10 hover:border-white/20 focus-within:!border-blue-500/60 bg-white/5",
                 }}
@@ -105,7 +105,7 @@ const AddUserModal = ({
                 onValueChange={setPassword}
                 startContent={<Key size={16} className="text-zinc-500" />}
                 classNames={{
-                  label: "text-zinc-400 font-medium pb-2",
+                  label: "text-zinc-400 font-medium pb-3",
                   input: "text-white",
                   inputWrapper: "border-white/10 hover:border-white/20 focus-within:!border-blue-500/60 bg-white/5",
                 }}
@@ -218,7 +218,7 @@ const EditUserModal = ({
                 onValueChange={setUsername}
                 startContent={<UserIcon size={16} className="text-zinc-500" />}
                 classNames={{
-                  label: "text-zinc-400 font-medium pb-2",
+                  label: "text-zinc-400 font-medium pb-3",
                   input: "text-white",
                   inputWrapper: "border-white/10 hover:border-white/20 focus-within:!border-amber-500/60 bg-white/5",
                 }}
@@ -232,7 +232,7 @@ const EditUserModal = ({
                 onValueChange={setPassword}
                 startContent={<Key size={16} className="text-zinc-500" />}
                 classNames={{
-                  label: "text-zinc-400 font-medium pb-2",
+                  label: "text-zinc-400 font-medium pb-3",
                   input: "text-white",
                   inputWrapper: "border-white/10 hover:border-white/20 focus-within:!border-amber-500/60 bg-white/5",
                 }}

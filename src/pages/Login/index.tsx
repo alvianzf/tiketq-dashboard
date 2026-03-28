@@ -57,7 +57,7 @@ const LoginPage = () => {
               onValueChange={setUsername}
               startContent={<User size={18} className="text-zinc-400" />}
               classNames={{
-                label: "text-zinc-400 pb-2",
+                label: "text-zinc-400 pb-3",
                 input: "text-white",
                 inputWrapper: "border-white/10 hover:border-white/20 focus-within:!border-blue-500/50 bg-white/5",
               }}
@@ -81,7 +81,7 @@ const LoginPage = () => {
                 </button>
               }
               classNames={{
-                label: "text-zinc-400 pb-2",
+                label: "text-zinc-400 pb-3",
                 input: "text-white",
                 inputWrapper: "border-white/10 hover:border-white/20 focus-within:!border-blue-500/50 bg-white/5",
               }}
