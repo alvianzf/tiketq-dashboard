@@ -113,6 +113,15 @@ const CarRentalPage = () => {
     );
     if (result.isConfirmed) {
       await deletePhoto.mutateAsync(photoId);
+      
+      // Update local state immediately for instant feedback
+      if (editingCar) {
+        setEditingCar({
+          ...editingCar,
+          photos: editingCar.photos?.filter(p => p.id !== photoId) || []
+        });
+      }
+      
       // Remove from selection if it was selected
       setSelectedExistingPhotoIds(prev => prev.filter(id => id !== photoId));
       toast.success("Photo deleted");
@@ -135,6 +144,15 @@ const CarRentalPage = () => {
     
     if (result.isConfirmed) {
       await deletePhotosBulk.mutateAsync(selectedExistingPhotoIds);
+      
+      // Update local state immediately for instant feedback
+      if (editingCar) {
+        setEditingCar({
+          ...editingCar,
+          photos: editingCar.photos?.filter(p => !selectedExistingPhotoIds.includes(p.id)) || []
+        });
+      }
+      
       toast.success(`${selectedExistingPhotoIds.length} photos deleted`);
       setSelectedExistingPhotoIds([]);
     }

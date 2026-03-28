@@ -108,7 +108,7 @@ export const adminService = {
     return data.data;
   },
   deletePhotosBulk: async (photoIds: number[]) => {
-    const { data } = await api.delete("/car-rental/photos/bulk", { data: { ids: photoIds } });
+    const { data } = await api.post("/car-rental/photos/bulk-delete", { ids: photoIds });
     return data.data;
   },
 };
