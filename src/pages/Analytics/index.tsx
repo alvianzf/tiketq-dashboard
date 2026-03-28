@@ -1,5 +1,5 @@
 import { Card, CardBody, Spinner } from "@nextui-org/react";
-import { BarChart3, PieChart as PieChartIcon, Activity, TrendingUp, DollarSign, BarChart2 } from "lucide-react";
+import { BarChart3, PieChart as PieChartIcon, Activity, TrendingUp, Banknote, BarChart2 } from "lucide-react";
 import { 
   BarChart, 
   Bar, 
@@ -34,7 +34,7 @@ const AnalyticsPage = () => {
     {
       label: "Total Revenue",
       value: `Rp ${Number(statsData?.totalRevenue || 0).toLocaleString("id-ID")}`,
-      icon: DollarSign,
+      icon: Banknote,
       color: "text-[#00D5FF]",
       bg: "bg-[#00D5FF]/10",
     },
