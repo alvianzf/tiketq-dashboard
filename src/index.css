@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@source "../node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}";
+
 @layer base {
   body {
     @apply bg-zinc-950 text-zinc-100 antialiased;

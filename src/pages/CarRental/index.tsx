@@ -24,7 +24,7 @@ import {
 } from "@nextui-org/react";
 import { Plus, Search, Edit2, Trash2, Car as CarIcon } from "lucide-react";
 import { useState } from "react";
-import { useCars, useCarMutation, type Car } from "../../hooks/useAdmin.ts";
+import { useCars, useCarMutation, type Car } from "../../hooks/useAdmin";
 
 const carTypes = ["City Car", "Sedan", "SUV", "MPV", "Minibus", "Pick-up", "Double Cabin", "Van"];
 

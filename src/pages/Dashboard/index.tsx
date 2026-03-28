@@ -18,8 +18,8 @@ import {
   BarChart,
   Bar
 } from "recharts";
-import { useStats } from "../../hooks/useAdmin.ts";
-import SystemHealth from "../../components/SystemHealth.tsx";
+import { useStats } from "../../hooks/useAdmin";
+import SystemHealth from "../../components/SystemHealth";
 
 const DashboardPage = () => {
   const { data: statsData, isLoading } = useStats();

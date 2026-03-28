@@ -15,7 +15,7 @@ import {
   CardBody
 } from "@nextui-org/react";
 import { Search, Filter, Download, MoreVertical, Eye } from "lucide-react";
-import { useTransactions, type Transaction } from "../../hooks/useAdmin.ts";
+import { useTransactions, type Transaction } from "../../hooks/useAdmin";
 
 const statusColorMap: Record<string, "success" | "warning" | "danger" | "default" | "primary" | "secondary"> = {
   success: "success",

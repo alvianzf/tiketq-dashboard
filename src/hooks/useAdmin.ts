@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { adminService } from "../services/api.ts";
+import { adminService } from "../services/api";
 
 export interface Transaction {
   id: number;

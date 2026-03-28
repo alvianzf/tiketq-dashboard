@@ -1,6 +1,6 @@
 import { Card, CardBody, Progress, Chip } from "@nextui-org/react";
 import { Activity, ShieldCheck, Cpu, HardDrive, Clock } from "lucide-react";
-import { useHealth } from "../hooks/useAdmin.ts";
+import { useHealth } from "../hooks/useAdmin";
 
 const SystemHealth = () => {
   const { data: health, isLoading } = useHealth();

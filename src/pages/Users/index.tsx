@@ -23,7 +23,7 @@ import {
 } from "@nextui-org/react";
 import { UserPlus, Shield, Trash2, Edit3, Key, User as UserIcon } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { adminService } from "../../services/api.ts";
+import { adminService } from "../../services/api";
 
 const UsersPage = () => {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();

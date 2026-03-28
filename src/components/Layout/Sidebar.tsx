@@ -8,7 +8,7 @@ import {
   TrendingUp,
   Users
 } from "lucide-react";
-import { cn } from "../../lib/utils.ts";
+import { cn } from "../../lib/utils";
 import { useAuth } from "../../context/AuthContext";
 
 const Sidebar = () => {
