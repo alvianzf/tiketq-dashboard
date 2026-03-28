@@ -25,8 +25,8 @@ import {
 import { Plus, Search, Edit2, Trash2, Car as CarIcon, Upload, X, Camera } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 import { useCars, useCarMutation, type Car } from "../../hooks/useAdmin";
 
 const carTypes = ["City Car", "Sedan", "SUV", "MPV", "Minibus", "Pick-up", "Double Cabin", "Van"];
@@ -136,7 +136,7 @@ const CarRentalPage = () => {
         });
       } else {
         const newCar = await createCar.mutateAsync({ ...formState, available: true });
-        carId = (newCar as any).id;
+        carId = newCar.id;
         toast.success("Vehicle added", {
           description: `${formState.name} has been added to your inventory.`,
         });
@@ -410,7 +410,7 @@ const CarRentalPage = () => {
                   {/* Existing Photos */}
                   {editingCar && editingCar.photos && editingCar.photos.length > 0 && (
                     <div className="grid grid-cols-4 gap-3">
-                      {editingCar.photos.map((photo: any) => (
+                      {editingCar.photos.map((photo) => (
                         <div key={photo.id} className="relative group aspect-video rounded-xl overflow-hidden border border-white/10 bg-white/5">
                           <Image src={photo.url} className="object-cover w-full h-full" />
                           <button 
