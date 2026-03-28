@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardBody, Input, Button, CardHeader } from "@nextui-org/react";
 import { Lock, User, Eye, EyeOff } from "lucide-react";
+import { toast } from "sonner";
 import { useAuth } from "../../context/AuthContext";
 
 const LoginPage = () => {
@@ -9,7 +10,6 @@ const LoginPage = () => {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [error, setError] = useState("");
   const { login } = useAuth();
   const navigate = useNavigate();
 
@@ -18,12 +18,15 @@ const LoginPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setError("");
     try {
       await login(username, password);
+      toast.success("Welcome back!", {
+        description: "You have successfully logged into the admin dashboard.",
+      });
       navigate("/");
     } catch (err: any) {
-      setError(err.response?.data?.error || "Invalid credentials");
+      // Error handled by global interceptor, but we can add specific logic here if needed
+      console.error("Login failed", err);
     } finally {
       setIsLoading(false);
     }
@@ -83,12 +86,6 @@ const LoginPage = () => {
                 inputWrapper: "border-white/10 hover:border-white/20 focus-within:!border-blue-500/50 bg-white/5",
               }}
             />
-
-            {error && (
-              <p className="text-red-400 text-sm text-center bg-red-400/10 py-2 rounded-lg border border-red-400/20">
-                {error}
-              </p>
-            )}
 
             <Button
               type="submit"

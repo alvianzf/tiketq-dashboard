@@ -1,4 +1,5 @@
 import axios from "axios";
+import { toast } from "sonner";
 import type { Car, Transaction, Stats, Health } from "../hooks/useAdmin";
 import type { User as AuthUser } from "../services/AuthService";
 
@@ -19,6 +20,30 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Response Interceptor for Global Error Handling
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    const message = error.response?.data?.error || error.response?.data?.message || "Something went wrong";
+    
+    // Don't show toast for 401 on /auth/me (check initial auth)
+    const isCheckAuth = error.config.url === "/auth/me";
+    
+    if (error.response?.status >= 500) {
+      toast.error("Server Error", {
+        description: "The server encountered an internal error. Please try again later.",
+      });
+    } else if (error.response?.status !== 401 || !isCheckAuth) {
+      // Show error toast for other errors except initial auth check
+      toast.error("Error", {
+        description: message,
+      });
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 export const adminService = {
   getTransactions: async (): Promise<Transaction[]> => {

@@ -24,6 +24,7 @@ import {
 } from "@nextui-org/react";
 import { Plus, Search, Edit2, Trash2, Car as CarIcon } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { useCars, useCarMutation, type Car } from "../../hooks/useAdmin";
 
 const carTypes = ["City Car", "Sedan", "SUV", "MPV", "Minibus", "Pick-up", "Double Cabin", "Van"];
@@ -57,16 +58,22 @@ const CarRentalPage = () => {
   const handleDelete = async (id: number) => {
     if (window.confirm("Are you sure you want to remove this car from inventory?")) {
       await deleteCar.mutateAsync(id);
+      toast.success("Vehicle removed", {
+        description: "The car has been successfully removed from the inventory.",
+      });
     }
   };
 
   const handleCreate = async () => {
-    if (!newCar.name.trim()) return alert("Car Name is required.");
-    if (!newCar.type) return alert("Car Type is required.");
-    if (newCar.pricePerDay <= 0) return alert("Price per day must be greater than 0.");
-    if (newCar.rows <= 0) return alert("Number of rows must be greater than 0.");
+    if (!newCar.name.trim()) return toast.error("Validation Error", { description: "Car Name is required." });
+    if (!newCar.type) return toast.error("Validation Error", { description: "Car Type is required." });
+    if (newCar.pricePerDay <= 0) return toast.error("Validation Error", { description: "Price per day must be greater than 0." });
+    if (newCar.rows <= 0) return toast.error("Validation Error", { description: "Number of rows must be greater than 0." });
     
     await createCar.mutateAsync({ ...newCar, available: true });
+    toast.success("Vehicle added", {
+      description: `${newCar.name} has been added to your inventory.`,
+    });
     setNewCar({ name: "", type: "SUV", pricePerDay: 500000, rows: 3 });
     onClose();
   };

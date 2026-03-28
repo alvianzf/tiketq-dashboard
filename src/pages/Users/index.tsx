@@ -22,6 +22,7 @@ import {
   Spinner,
 } from "@nextui-org/react";
 import { UserPlus, Shield, Trash2, Edit3, Key, User as UserIcon, ShieldOff } from "lucide-react";
+import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { adminService } from "../../services/api";
 import type { User as UserType } from "../../services/AuthService";
@@ -42,6 +43,9 @@ const AddUserModal = ({
     mutationFn: adminService.registerUser,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success("Administrator Created", {
+        description: `Account for ${username} has been successfully created.`,
+      });
       setUsername("");
       setPassword("");
       onOpenChange();
@@ -154,6 +158,9 @@ const EditUserModal = ({
     mutationFn: (data: Record<string, unknown>) => adminService.updateUser(user!.id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success("Account Updated", {
+        description: `Administrator details have been saved.`,
+      });
       onClose();
     },
   });
@@ -260,8 +267,19 @@ const UsersPage = () => {
 
   const deleteMutation = useMutation({
     mutationFn: adminService.deleteUser,
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["users"] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success("User Deleted", {
+        description: "The administrative account has been removed.",
+      });
+    },
   });
+
+  const handleDelete = (id: number) => {
+    if (window.confirm("Are you sure you want to delete this administrator? This action cannot be undone.")) {
+      deleteMutation.mutate(id);
+    }
+  };
 
   if (isLoading) {
     return (
@@ -381,7 +399,7 @@ const UsersPage = () => {
                           size="sm"
                           variant="flat"
                           isLoading={deleteMutation.isPending}
-                          onPress={() => deleteMutation.mutate(user.id)}
+                          onPress={() => handleDelete(user.id)}
                           className="bg-red-500/5 text-red-400 hover:text-red-300 hover:bg-red-500/10 border border-red-500/10 transition-all"
                         >
                           <Trash2 size={15} />
