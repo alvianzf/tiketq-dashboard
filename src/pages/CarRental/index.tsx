@@ -22,7 +22,7 @@ import {
   Chip,
   Tooltip,
 } from "@nextui-org/react";
-import { Plus, Search, Edit2, Trash2, Car as CarIcon, Upload, X, Camera } from "lucide-react";
+import { Plus, Search, Edit2, Trash2, Car as CarIcon, Upload, X, Camera, Check } from "lucide-react";
 import { useState, useRef } from "react";
 import { toast } from "sonner";
 import ReactQuill from 'react-quill-new';
@@ -48,9 +48,10 @@ const INPUT_CLASSES = {
 const CarRentalPage = () => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const { data: cars, isLoading } = useCars();
-  const { createCar, updateCar, deleteCar, uploadPhotos, deletePhoto } = useCarMutation();
+  const { createCar, updateCar, deleteCar, uploadPhotos, deletePhoto, deletePhotosBulk } = useCarMutation();
   const [search, setSearch] = useState("");
   const [editingCar, setEditingCar] = useState<Car | null>(null);
+  const [selectedExistingPhotoIds, setSelectedExistingPhotoIds] = useState<number[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formState, setFormState] = useState({
@@ -112,7 +113,30 @@ const CarRentalPage = () => {
     );
     if (result.isConfirmed) {
       await deletePhoto.mutateAsync(photoId);
+      // Remove from selection if it was selected
+      setSelectedExistingPhotoIds(prev => prev.filter(id => id !== photoId));
       toast.success("Photo deleted");
+    }
+  };
+
+  const togglePhotoSelection = (id: number) => {
+    setSelectedExistingPhotoIds(prev =>
+      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+    );
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedExistingPhotoIds.length === 0) return;
+    
+    const result = await confirmDelete(
+      "Delete Selected Photos?",
+      `Are you sure you want to delete ${selectedExistingPhotoIds.length} photos? This action cannot be undone.`
+    );
+    
+    if (result.isConfirmed) {
+      await deletePhotosBulk.mutateAsync(selectedExistingPhotoIds);
+      toast.success(`${selectedExistingPhotoIds.length} photos deleted`);
+      setSelectedExistingPhotoIds([]);
     }
   };
 
@@ -299,6 +323,8 @@ const CarRentalPage = () => {
         backdrop="blur"
         isOpen={isOpen}
         onOpenChange={onOpenChange}
+        isDismissable={false}
+        isKeyboardDismissDisabled={true}
         classNames={MODAL_CLASSES}
         size="2xl"
       >
@@ -395,15 +421,30 @@ const CarRentalPage = () => {
                       <Camera size={18} className="text-blue-400" />
                       <h3 className="text-white font-bold">Vehicle Gallery</h3>
                     </div>
-                    <Button 
-                      size="sm" 
-                      variant="flat" 
-                      className="bg-blue-600/10 text-blue-400"
-                      startContent={<Upload size={14} />}
-                      onPress={() => fileInputRef.current?.click()}
-                    >
-                      Add Photos
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      {selectedExistingPhotoIds.length > 0 && (
+                        <Button 
+                          size="sm" 
+                          variant="flat" 
+                          color="danger"
+                          className="bg-red-500/10 text-red-400"
+                          startContent={<Trash2 size={14} />}
+                          onPress={handleBulkDelete}
+                          isLoading={deletePhotosBulk.isPending}
+                        >
+                          Delete ({selectedExistingPhotoIds.length})
+                        </Button>
+                      )}
+                      <Button 
+                        size="sm" 
+                        variant="flat" 
+                        className="bg-blue-600/10 text-blue-400"
+                        startContent={<Upload size={14} />}
+                        onPress={() => fileInputRef.current?.click()}
+                      >
+                        Add Photos
+                      </Button>
+                    </div>
                     <input 
                       type="file" 
                       multiple 
@@ -417,17 +458,36 @@ const CarRentalPage = () => {
                   {/* Existing Photos */}
                   {editingCar && editingCar.photos && editingCar.photos.length > 0 && (
                     <div className="grid grid-cols-4 gap-3">
-                      {editingCar.photos.map((photo) => (
-                        <div key={photo.id} className="relative group aspect-video rounded-xl overflow-hidden border border-white/10 bg-white/5">
-                          <Image src={photo.url} className="object-cover w-full h-full" />
-                          <button 
-                            onClick={() => handleDeletePhoto(photo.id)}
-                            className="absolute top-1 right-1 p-1 bg-red-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                      {editingCar.photos.map((photo) => {
+                        const isSelected = selectedExistingPhotoIds.includes(photo.id);
+                        return (
+                          <div 
+                            key={photo.id} 
+                            onClick={() => togglePhotoSelection(photo.id)}
+                            className={`relative group aspect-video rounded-xl overflow-hidden border transition-all cursor-pointer ${isSelected ? 'border-blue-500 ring-2 ring-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.5)]' : 'border-white/10 hover:border-white/30 bg-white/5'}`}
                           >
-                            <X size={12} className="text-white" />
-                          </button>
-                        </div>
-                      ))}
+                            <Image src={photo.url} className="object-cover w-full h-full" />
+                            {isSelected && (
+                              <div className="absolute inset-0 bg-blue-600/20 flex items-center justify-center backdrop-blur-[1px]">
+                                <div className="bg-blue-500 rounded-full p-1 shadow-lg">
+                                  <Check size={14} className="text-white" />
+                                </div>
+                              </div>
+                            )}
+                            {!isSelected && (
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeletePhoto(photo.id);
+                                }}
+                                className="absolute top-1 right-1 p-1.5 bg-red-600/90 hover:bg-red-600 rounded-lg opacity-0 group-hover:opacity-100 transition-all transform hover:scale-110 shadow-lg"
+                              >
+                                <X size={12} className="text-white" />
+                              </button>
+                            )}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
 

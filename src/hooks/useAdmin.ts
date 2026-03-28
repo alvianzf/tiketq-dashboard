@@ -99,5 +99,10 @@ export const useCarMutation = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["cars"] }),
   });
 
-  return { createCar, updateCar, deleteCar, uploadPhotos, deletePhoto };
+  const deletePhotosBulk = useMutation({
+    mutationFn: (photoIds: number[]) => adminService.deletePhotosBulk(photoIds),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["cars"] }),
+  });
+
+  return { createCar, updateCar, deleteCar, uploadPhotos, deletePhoto, deletePhotosBulk };
 };
