@@ -36,7 +36,10 @@ export interface Car {
   rows: number;
   pricePerDay: number;
   available: boolean;
-  photos?: { url: string }[];
+  description?: string;
+  transmission?: string;
+  features?: string[];
+  photos?: { id: number; url: string; isPrimary: boolean }[];
 }
 
 export const useTransactions = () => {
@@ -86,5 +89,15 @@ export const useCarMutation = () => {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ["cars"] }),
   });
 
-  return { createCar, updateCar, deleteCar };
+  const uploadPhotos = useMutation({
+    mutationFn: ({ carId, photos }: { carId: number; photos: File[] }) => adminService.uploadPhotos(carId, photos),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["cars"] }),
+  });
+
+  const deletePhoto = useMutation({
+    mutationFn: (photoId: number) => adminService.deletePhoto(photoId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["cars"] }),
+  });
+
+  return { createCar, updateCar, deleteCar, uploadPhotos, deletePhoto };
 };

@@ -22,9 +22,11 @@ import {
   Chip,
   Tooltip,
 } from "@nextui-org/react";
-import { Plus, Search, Edit2, Trash2, Car as CarIcon } from "lucide-react";
-import { useState } from "react";
+import { Plus, Search, Edit2, Trash2, Car as CarIcon, Upload, X, Camera } from "lucide-react";
+import { useState, useRef } from "react";
 import { toast } from "sonner";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import { useCars, useCarMutation, type Car } from "../../hooks/useAdmin";
 
 const carTypes = ["City Car", "Sedan", "SUV", "MPV", "Minibus", "Pick-up", "Double Cabin", "Van"];
@@ -45,20 +47,28 @@ const INPUT_CLASSES = {
 const CarRentalPage = () => {
   const { isOpen, onOpen, onOpenChange, onClose } = useDisclosure();
   const { data: cars, isLoading } = useCars();
-  const { createCar, updateCar, deleteCar } = useCarMutation();
+  const { createCar, updateCar, deleteCar, uploadPhotos, deletePhoto } = useCarMutation();
   const [search, setSearch] = useState("");
   const [editingCar, setEditingCar] = useState<Car | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formState, setFormState] = useState({
     name: "",
     type: "SUV",
     pricePerDay: 500000,
     rows: 3,
+    description: "",
+    transmission: "Automatic",
   });
+
+  const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
+  const [photoPreviews, setPhotoPreviews] = useState<string[]>([]);
 
   const handleOpenAdd = () => {
     setEditingCar(null);
-    setFormState({ name: "", type: "SUV", pricePerDay: 500000, rows: 3 });
+    setFormState({ name: "", type: "SUV", pricePerDay: 500000, rows: 3, description: "", transmission: "Automatic" });
+    setSelectedPhotos([]);
+    setPhotoPreviews([]);
     onOpen();
   };
 
@@ -69,8 +79,36 @@ const CarRentalPage = () => {
       type: car.type,
       pricePerDay: car.pricePerDay,
       rows: car.rows,
+      description: car.description || "",
+      transmission: car.transmission || "Automatic",
     });
+    setSelectedPhotos([]);
+    setPhotoPreviews([]);
     onOpen();
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) {
+      setSelectedPhotos(prev => [...prev, ...files]);
+      const newPreviews = files.map(file => URL.createObjectURL(file));
+      setPhotoPreviews(prev => [...prev, ...newPreviews]);
+    }
+  };
+
+  const removeSelectedPhoto = (index: number) => {
+    setSelectedPhotos(prev => prev.filter((_, i) => i !== index));
+    setPhotoPreviews(prev => {
+      URL.revokeObjectURL(prev[index]);
+      return prev.filter((_, i) => i !== index);
+    });
+  };
+
+  const handleDeletePhoto = async (photoId: number) => {
+    if (window.confirm("Remove this photo permanently?")) {
+      await deletePhoto.mutateAsync(photoId);
+      toast.success("Photo deleted");
+    }
   };
 
   const handleDelete = async (id: number) => {
@@ -88,20 +126,35 @@ const CarRentalPage = () => {
     if (formState.pricePerDay <= 0) return toast.error("Validation Error", { description: "Price per day must be greater than 0." });
     if (formState.rows <= 0) return toast.error("Validation Error", { description: "Number of rows must be greater than 0." });
     
-    if (editingCar) {
-      await updateCar.mutateAsync({ id: editingCar.id, data: formState });
-      toast.success("Vehicle updated", {
-        description: `${formState.name} has been successfully updated.`,
-      });
-    } else {
-      await createCar.mutateAsync({ ...formState, available: true });
-      toast.success("Vehicle added", {
-        description: `${formState.name} has been added to your inventory.`,
-      });
+    try {
+      let carId: number;
+      if (editingCar) {
+        await updateCar.mutateAsync({ id: editingCar.id, data: formState });
+        carId = editingCar.id;
+        toast.success("Vehicle updated", {
+          description: `${formState.name} has been successfully updated.`,
+        });
+      } else {
+        const newCar = await createCar.mutateAsync({ ...formState, available: true });
+        carId = (newCar as any).id;
+        toast.success("Vehicle added", {
+          description: `${formState.name} has been added to your inventory.`,
+        });
+      }
+      
+      // Upload photos if any
+      if (selectedPhotos.length > 0) {
+        await uploadPhotos.mutateAsync({ carId, photos: selectedPhotos });
+        toast.success("Photos uploaded successfully");
+      }
+      
+      setFormState({ name: "", type: "SUV", pricePerDay: 500000, rows: 3, description: "", transmission: "Automatic" });
+      setSelectedPhotos([]);
+      setPhotoPreviews([]);
+      onClose();
+    } catch (err) {
+      console.error("Failed to save car", err);
     }
-    
-    setFormState({ name: "", type: "SUV", pricePerDay: 500000, rows: 3 });
-    onClose();
   };
 
   const filtered = (cars || []).filter((c: Car) =>
@@ -315,6 +368,81 @@ const CarRentalPage = () => {
                     value={formState.rows.toString()}
                     onValueChange={(v) => setFormState((p) => ({ ...p, rows: Number(v) }))}
                   />
+                </div>
+
+                <div className="flex flex-col gap-2 mt-2">
+                  <label className="text-zinc-400 font-medium text-sm">Vehicle Description</label>
+                  <div className="bg-zinc-800/50 rounded-xl border border-white/10 overflow-hidden">
+                    <ReactQuill 
+                      theme="snow" 
+                      value={formState.description} 
+                      onChange={(v) => setFormState(p => ({ ...p, description: v }))}
+                      className="text-white h-[180px] mb-12"
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Camera size={18} className="text-blue-400" />
+                      <h3 className="text-white font-bold">Vehicle Gallery</h3>
+                    </div>
+                    <Button 
+                      size="sm" 
+                      variant="flat" 
+                      className="bg-blue-600/10 text-blue-400"
+                      startContent={<Upload size={14} />}
+                      onPress={() => fileInputRef.current?.click()}
+                    >
+                      Add Photos
+                    </Button>
+                    <input 
+                      type="file" 
+                      multiple 
+                      hidden 
+                      ref={fileInputRef} 
+                      accept="image/*"
+                      onChange={handleFileChange}
+                    />
+                  </div>
+
+                  {/* Existing Photos */}
+                  {editingCar && editingCar.photos && editingCar.photos.length > 0 && (
+                    <div className="grid grid-cols-4 gap-3">
+                      {editingCar.photos.map((photo: any) => (
+                        <div key={photo.id} className="relative group aspect-video rounded-xl overflow-hidden border border-white/10 bg-white/5">
+                          <Image src={photo.url} className="object-cover w-full h-full" />
+                          <button 
+                            onClick={() => handleDeletePhoto(photo.id)}
+                            className="absolute top-1 right-1 p-1 bg-red-600 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X size={12} className="text-white" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* New Selected Photos */}
+                  {photoPreviews.length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs text-zinc-500 uppercase font-bold">Newly Selected</p>
+                      <div className="grid grid-cols-4 gap-3">
+                        {photoPreviews.map((url, i) => (
+                          <div key={i} className="relative group aspect-video rounded-xl overflow-hidden border border-blue-500/30 bg-blue-500/5">
+                            <Image src={url} className="object-cover w-full h-full" />
+                            <button 
+                              onClick={() => removeSelectedPhoto(i)}
+                              className="absolute top-1 right-1 p-1 bg-zinc-900/80 rounded-lg"
+                            >
+                              <X size={12} className="text-white" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </ModalBody>
 

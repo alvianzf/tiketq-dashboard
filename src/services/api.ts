@@ -93,4 +93,18 @@ export const adminService = {
     const { data } = await api.delete(`/car-rental/cars/${id}`);
     return data.data;
   },
+
+  uploadPhotos: async (carId: number, photos: File[]) => {
+    const formData = new FormData();
+    photos.forEach((photo) => formData.append("photos", photo));
+    const { data } = await api.post(`/car-rental/cars/${carId}/photos`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return data.data;
+  },
+
+  deletePhoto: async (photoId: number) => {
+    const { data } = await api.delete(`/car-rental/photos/${photoId}`);
+    return data.data;
+  },
 };
