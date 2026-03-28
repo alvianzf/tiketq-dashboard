@@ -61,6 +61,11 @@ const CarRentalPage = () => {
   };
 
   const handleCreate = async () => {
+    if (!newCar.name.trim()) return alert("Car Name is required.");
+    if (!newCar.type) return alert("Car Type is required.");
+    if (newCar.pricePerDay <= 0) return alert("Price per day must be greater than 0.");
+    if (newCar.rows <= 0) return alert("Number of rows must be greater than 0.");
+    
     await createCar.mutateAsync({ ...newCar, available: true });
     setNewCar({ name: "", type: "SUV", pricePerDay: 500000, rows: 3 });
     onClose();
@@ -234,8 +239,18 @@ const CarRentalPage = () => {
                       value: "text-white",
                       trigger: "border-white/10 hover:border-white/20 bg-white/5",
                     }}
-                    selectedKeys={[newCar.type]}
-                    onSelectionChange={(v) => setNewCar((p) => ({ ...p, type: Array.from(v)[0] as string }))}
+                    popoverProps={{
+                      classNames: {
+                        base: "bg-zinc-900 border border-white/10 backdrop-blur-2xl shadow-2xl",
+                      }
+                    }}
+                    listboxProps={{
+                      itemClasses: {
+                        base: "text-white data-[hover=true]:bg-white/10 data-[selectable=true]:focus:bg-white/10",
+                      }
+                    }}
+                    selectedKeys={newCar.type ? [newCar.type] : []}
+                    onSelectionChange={(v) => setNewCar((p) => ({ ...p, type: Array.from(v)[0] as string || p.type }))}
                   >
                     {carTypes.map((type) => (
                       <SelectItem key={type}>{type}</SelectItem>
