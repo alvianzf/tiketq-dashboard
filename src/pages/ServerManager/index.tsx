@@ -37,8 +37,7 @@ import {
   Cpu,
   Database,
   Play,
-  Github,
-  ChevronLast
+  Terminal as ShellIcon
 } from "lucide-react";
 import { adminService } from "../../services/api";
 import { toast } from "sonner";
@@ -364,7 +363,7 @@ const ServerManager = () => {
                       input: "bg-transparent text-white truncate",
                       inputWrapper: "bg-white/5 border-white/10 group-data-[focus=true]:border-blue-500/50 h-10 text-xs"
                     }}
-                    startContent={<Github size={14} className="text-zinc-500" />}
+                    startContent={<Download size={14} className="text-zinc-500" />}
                   />
                   <Button 
                     variant="flat"
@@ -518,7 +517,7 @@ const ServerManager = () => {
                 )}
               </div>
               <div className="p-1 px-4 bg-zinc-900/50 border-t border-white/5 flex gap-2 items-center">
-                 <ChevronLast size={14} className="text-zinc-600" />
+                 <ShellIcon size={14} className="text-zinc-600" />
                  <Input 
                    size="sm" 
                    variant="underlined"
