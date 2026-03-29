@@ -43,6 +43,15 @@ export interface Car {
   photos?: { id: number; url: string; isPrimary: boolean }[];
 }
 
+export interface Schedule {
+  id: string;
+  type: "FLIGHT" | "FERRY" | "CAR";
+  productName: string;
+  date: string;
+  customerName: string;
+  detail: string;
+}
+
 export const useTransactions = () => {
   return useQuery({
     queryKey: ["transactions"],
@@ -54,6 +63,13 @@ export const useStats = () => {
   return useQuery({
     queryKey: ["stats"],
     queryFn: adminService.getStats,
+  });
+};
+
+export const useSchedules = () => {
+  return useQuery({
+    queryKey: ["schedules"],
+    queryFn: adminService.getUpcomingSchedules,
   });
 };
 

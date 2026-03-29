@@ -1,6 +1,6 @@
 import axios from "axios";
 import { toast } from "sonner";
-import type { Car, Transaction, Stats, Health } from "../hooks/useAdmin";
+import type { Car, Transaction, Stats, Health, Schedule } from "../hooks/useAdmin";
 import type { User as AuthUser } from "../services/AuthService";
 
 interface AppResponse<T> {
@@ -56,6 +56,10 @@ export const adminService = {
   },
   getHealth: async (): Promise<Health> => {
     const { data } = await api.get<AppResponse<Health>>("/admin/health");
+    return data.data;
+  },
+  getUpcomingSchedules: async (): Promise<Schedule[]> => {
+    const { data } = await api.get<AppResponse<Schedule[]>>("/admin/upcoming-schedules");
     return data.data;
   },
   

@@ -20,6 +20,7 @@ import {
 } from "recharts";
 import { useStats } from "../../hooks/useAdmin";
 import SystemHealth from "../../components/SystemHealth";
+import UpcomingSchedules from "../../components/UpcomingSchedules";
 
 const DashboardPage = () => {
   const { data: statsData, isLoading } = useStats();
@@ -163,6 +164,9 @@ const DashboardPage = () => {
           </CardBody>
         </Card>
       </div>
+
+      {/* Upcoming Schedules Pipeline Section */}
+      <UpcomingSchedules />
     </div>
   );
 };
