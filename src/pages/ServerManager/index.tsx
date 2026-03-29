@@ -41,7 +41,16 @@ import {
   History,
   Activity,
   HardDrive,
-  Clock
+  Clock,
+  FileCode,
+  FileJson,
+  Image,
+  Settings,
+  Layers,
+  Layout,
+  Code2,
+  Globe,
+  FileArchive
 } from "lucide-react";
 import { adminService } from "../../services/api";
 import { toast } from "sonner";
@@ -271,6 +280,56 @@ const ServerManager = () => {
       setLogs(prev => [...prev, `[CRITICAL] System Error: ${error.message}`]);
     } finally {
       setIsExecuting(false);
+    }
+  };
+
+  const renderFileIcon = (file: ServerFile) => {
+    const extension = file.name.split('.').pop()?.toLowerCase();
+    
+    if (file.isDir) {
+       if (file.hasPackageJson) return <Package size={14} className="text-green-400" />;
+       if (file.name === 'node_modules') return <Cpu size={14} className="text-zinc-500" />;
+       if (file.name === 'src' || file.name === 'app' || file.name === 'routes') return <Code2 size={14} className="text-blue-400" />;
+       if (file.name === 'public' || file.name === 'assets') return <Layout size={14} className="text-orange-400" />;
+       if (file.name === 'prisma' || file.name === 'db') return <Database size={14} className="text-purple-400" />;
+       if (file.name === '.git') return <History size={14} className="text-red-400" />;
+       return <Folder size={14} className="text-[#00D5FF]" />;
+    }
+
+    switch (extension) {
+      case 'js':
+      case 'ts':
+      case 'tsx':
+      case 'jsx':
+        return <FileCode size={14} className="text-blue-400" />;
+      case 'json':
+        return <FileJson size={14} className="text-orange-400" />;
+      case 'prisma':
+      case 'sql':
+        return <Database size={14} className="text-purple-400" />;
+      case 'css':
+      case 'scss':
+        return <Layers size={14} className="text-pink-400" />;
+      case 'html':
+        return <Globe size={14} className="text-green-400" />;
+      case 'png':
+      case 'jpg':
+      case 'jpeg':
+      case 'svg':
+      case 'webp':
+        return <Image size={14} className="text-yellow-400" />;
+      case 'env':
+      case 'config':
+        return <Settings size={14} className="text-zinc-400" />;
+      case 'sh':
+      case 'bash':
+        return <Terminal size={14} className="text-green-500" />;
+      case 'zip':
+      case 'gz':
+      case 'tar':
+        return <FileArchive size={14} className="text-red-500" />;
+      default:
+        return <FileText size={14} className="text-zinc-500" />;
     }
   };
 
@@ -514,11 +573,16 @@ const ServerManager = () => {
                     >
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-lg ${file.isDir ? "bg-[#00D5FF]/10 text-[#00D5FF]" : "bg-zinc-500/10 text-zinc-400"}`}>
-                            {file.isDir ? <Folder size={14} /> : <FileText size={14} />}
+                          <div className="bg-white/5 p-2 rounded-lg flex items-center justify-center">
+                            {renderFileIcon(file)}
                           </div>
                           <div className="flex flex-col">
-                            <span className="text-xs font-semibold text-white">{file.name}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs font-semibold text-white">{file.name}</span>
+                              {file.isDir && file.hasPackageJson && (
+                                <Chip size="sm" variant="flat" color="success" className="h-4 text-[8px] font-bold">Node.js</Chip>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </TableCell>
