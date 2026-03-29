@@ -26,14 +26,10 @@ import {
   FileText, 
   Terminal, 
   Package,
-  ArrowUpCircle,
-  Download,
-  RefreshCw,
   ShieldCheck,
   Trash2,
   Cpu,
   Database,
-  PlayCircle,
   Edit,
   Save,
   Move,
@@ -51,7 +47,6 @@ import {
   Globe,
   FileArchive,
   Power,
-  RotateCcw,
   Zap,
   GitFork,
   GitPullRequest,
@@ -61,7 +56,8 @@ import {
   Box,
   ChevronRight,
   DatabaseBackup,
-  Undo2
+  Undo2,
+  RefreshCw
 } from "lucide-react";
 import { adminService } from "../../services/api";
 import { toast } from "sonner";
@@ -601,7 +597,7 @@ const ServerManager = () => {
                       <TableCell className="text-right px-8">
                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <Button isIconOnly size="sm" variant="light" className="text-zinc-500 hover:text-white" onPress={() => file.isDir ? handleFolderClick(file.path) : handleFileView(file)}>
-                            {file.isDir ? <Search size={12} /> : <Edit size={12} />}
+                            {file.isDir ? <RefreshCw size={12} /> : <Edit size={12} />}
                           </Button>
                           <Button isIconOnly size="sm" variant="light" className="text-zinc-500 hover:text-blue-400" onPress={() => moveItem(file.path, file.name)}>
                             <Move size={12} />
