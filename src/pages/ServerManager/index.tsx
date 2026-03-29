@@ -52,7 +52,6 @@ import {
   GitPullRequest,
   Rocket,
   ShieldAlert,
-  Search,
   Box,
   ChevronRight,
   DatabaseBackup,
