@@ -141,6 +141,10 @@ export const adminService = {
     const { data } = await api.get("/admin/server/pm2");
     return data.data;
   },
+  getServerHealth: async () => {
+    const { data } = await api.get("/admin/server/health");
+    return data.data;
+  },
   executeServerCommand: async (action: string, id?: string, customPath?: string, extra?: { url?: string; command?: string }) => {
     const { data } = await api.post("/admin/server/execute", { action, id, customPath, ...extra });
     return data.data;

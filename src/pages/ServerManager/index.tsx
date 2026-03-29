@@ -19,21 +19,17 @@ import {
   ModalBody,
   useDisclosure,
   Input,
-  Tooltip,
-  Textarea
+  Progress
 } from "@nextui-org/react";
 import { 
   Folder, 
   FileText, 
-  ChevronRight, 
   Terminal, 
   Package,
   ArrowUpCircle,
   Download,
   RefreshCw,
-  Search,
   ShieldCheck,
-  Square,
   Trash2,
   Cpu,
   Database,
@@ -42,7 +38,10 @@ import {
   Edit,
   Save,
   Move,
-  History
+  History,
+  Activity,
+  HardDrive,
+  Clock
 } from "lucide-react";
 import { adminService } from "../../services/api";
 import { toast } from "sonner";
@@ -69,6 +68,13 @@ interface PM2Process {
   pid: number;
 }
 
+interface ServerHealth {
+  cpu: { load: string; cores: number };
+  memory: { total: string; used: string; free: string; percent: string };
+  disk: { total: string; used: string; available: string; percent: string };
+  uptime: string;
+}
+
 const STORAGE_KEY = "tiketq_admin_server_path";
 
 const ServerManager = () => {
@@ -77,17 +83,16 @@ const ServerManager = () => {
   });
   const [files, setFiles] = useState<ServerFile[]>([]);
   const [processes, setProcesses] = useState<PM2Process[]>([]);
+  const [health, setHealth] = useState<ServerHealth | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshingPM2, setIsRefreshingPM2] = useState(false);
   
-  const [selectedFileContent, setSelectedFileContent] = useState("");
   const [editingContent, setEditingContent] = useState("");
   const [selectedFileName, setSelectedFileName] = useState("");
   const [selectedFilePath, setSelectedFilePath] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   
   const [logs, setLogs] = useState<string[]>([]);
-  const [pm2Id, setPm2Id] = useState("");
   const [gitUrl, setGitUrl] = useState("");
   const [rawCommand, setRawCommand] = useState("");
   const [isExecuting, setIsExecuting] = useState(false);
@@ -104,7 +109,6 @@ const ServerManager = () => {
       localStorage.setItem(STORAGE_KEY, path);
     } catch (err: unknown) {
       const error = err as Error;
-      console.error(error);
       toast.error("Failed to load files", { description: error.message });
     } finally {
       setIsLoading(false);
@@ -124,11 +128,25 @@ const ServerManager = () => {
     }
   };
 
+  const fetchHealth = async () => {
+    try {
+      const data = await adminService.getServerHealth();
+      setHealth(data);
+    } catch (err: unknown) {
+      console.error(err);
+    }
+  };
+
   useEffect(() => {
     fetchFiles(currentPath);
     fetchProcesses();
-    const interval = setInterval(fetchProcesses, 30000); 
+    fetchHealth();
+    const interval = setInterval(() => {
+      fetchProcesses();
+      fetchHealth();
+    }, 30000); 
     return () => clearInterval(interval);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -144,7 +162,6 @@ const ServerManager = () => {
   const handleFileView = async (file: ServerFile) => {
     try {
       const content = await adminService.getFileContent(file.path);
-      setSelectedFileContent(content);
       setEditingContent(content);
       setSelectedFileName(file.name);
       setSelectedFilePath(file.path);
@@ -159,7 +176,6 @@ const ServerManager = () => {
     setIsSaving(true);
     try {
       await adminService.saveServerFile(selectedFilePath, editingContent);
-      setSelectedFileContent(editingContent);
       toast.success("File saved successfully");
     } catch (err: unknown) {
       const error = err as Error;
@@ -170,12 +186,17 @@ const ServerManager = () => {
   };
 
   const deleteItem = async (path: string, name: string) => {
-    if (!confirm(`Are you sure you want to PERMANENTLY delete [${name}]? This action cannot be undone.`)) return;
+    if (!confirm(`Are you sure you want to PERMANENTLY delete [${name}]?`)) return;
     
     try {
-      await adminService.deleteServerFile(path);
+      if (processes.some(p => p.name === name || p.pm_id.toString() === path)) {
+         await adminService.executeServerCommand("pm2-delete", path);
+      } else {
+         await adminService.deleteServerFile(path);
+      }
       toast.success("Item deleted");
       fetchFiles(currentPath);
+      fetchProcesses();
     } catch (err: unknown) {
       const error = err as Error;
       toast.error("Delete failed", { description: error.message });
@@ -197,7 +218,7 @@ const ServerManager = () => {
   };
 
   const executeCommand = async (action: string, idToUse?: string, extra?: { url?: string; command?: string }) => {
-    const targetId = idToUse !== undefined ? idToUse : pm2Id;
+    const targetId = idToUse !== undefined ? idToUse : "";
     
     if (action.startsWith("pm2-") && targetId === "") {
       return toast.error("Please enter a PM2 Process ID or Name");
@@ -264,151 +285,185 @@ const ServerManager = () => {
         </div>
         <div className="flex items-center gap-2 text-zinc-500">
            <History size={14} className="text-orange-400/70" />
-           <p className="text-xs italic">Adaptive session memory active (restoring from last session)</p>
+           <p className="text-xs italic">Adaptive session memory active (restored path: /{currentPath || 'root'})</p>
         </div>
       </div>
 
-      <Card className="bg-white/5 border-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden border-t-blue-500/20 border-t-2">
-        <CardBody className="p-8">
-          <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-3">
-              <div className="p-2.5 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 shadow-inner">
-                <Cpu size={20} />
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* PM2 Processes - 2/3 width */}
+        <Card className="lg:col-span-2 bg-white/5 border-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden border-t-blue-500/20 border-t-2">
+          <CardBody className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 shadow-inner">
+                  <Activity size={18} />
+                </div>
+                <div className="flex flex-col">
+                  <h3 className="text-lg font-bold text-white tracking-tight">Active Processes</h3>
+                  <p className="text-[9px] text-zinc-500 font-mono tracking-widest uppercase">Lifecycle Manager</p>
+                </div>
+              </div>
+              
+              <Button 
+                size="sm" 
+                variant="flat" 
+                className="bg-white/5 text-zinc-300 border border-white/10 h-8 px-4 font-bold text-[10px]"
+                startContent={<RefreshCw size={12} className={isRefreshingPM2 ? "animate-spin" : ""} />}
+                onPress={fetchProcesses}
+                isLoading={isRefreshingPM2}
+              >
+                Sync
+              </Button>
+            </div>
+
+            <Table 
+              aria-label="PM2 Processes"
+              className="bg-transparent"
+              removeWrapper
+            >
+              <TableHeader>
+                <TableColumn className="bg-white/5 border-b border-white/10 text-zinc-500 text-[10px] font-bold uppercase tracking-widest">ID / Name</TableColumn>
+                <TableColumn className="bg-white/5 border-b border-white/10 text-zinc-500 text-[10px] font-bold uppercase tracking-widest">Status</TableColumn>
+                <TableColumn className="bg-white/5 border-b border-white/10 text-zinc-500 text-[10px] font-bold uppercase tracking-widest text-center">Load</TableColumn>
+                <TableColumn className="bg-white/5 border-b border-white/10 text-zinc-500 text-[10px] font-bold uppercase tracking-widest text-right">Actions</TableColumn>
+              </TableHeader>
+              <TableBody emptyContent={isRefreshingPM2 ? "Refreshing..." : "No active processes."}>
+                {processes.map((proc, i) => (
+                  <TableRow key={i} className="group hover:bg-white/5 transition-all border-b border-white/5 last:border-0">
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <div className="w-7 h-7 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center font-mono text-blue-400 text-[10px] shadow-inner">
+                          {proc.pm_id}
+                        </div>
+                        <div className="flex flex-col">
+                          <span className="text-xs font-bold text-white truncate max-w-[120px]">{proc.name}</span>
+                          <span className="text-[9px] text-zinc-500 font-mono">PID {proc.pid}</span>
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <Chip 
+                        size="sm" 
+                        variant="flat" 
+                        color={proc.pm2_env.status === 'online' ? 'success' : 'danger'}
+                        className="capitalize font-bold text-[9px] h-5"
+                      >
+                        {proc.pm2_env.status}
+                      </Chip>
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center justify-center gap-3">
+                        <div className="flex items-center gap-1 text-[10px] font-mono font-bold text-white">
+                           <Cpu size={10} className="text-blue-500" /> {proc.monit.cpu}%
+                        </div>
+                        <div className="flex items-center gap-1 text-[10px] font-mono font-bold text-white">
+                           <Database size={10} className="text-purple-500" /> {(proc.monit.memory / 1024 / 1024).toFixed(0)}MB
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <div className="flex items-center justify-end gap-1">
+                         <Button isIconOnly size="sm" variant="flat" className="bg-success/10 text-success hover:bg-success/20 h-7 w-7" onPress={() => executeCommand("pm2-start", proc.pm_id.toString())} isDisabled={proc.pm2_env.status === 'online'} isLoading={isExecuting}>
+                           <Play size={10} fill="currentColor" />
+                         </Button>
+                         <Button isIconOnly size="sm" variant="flat" className="bg-primary/10 text-primary hover:bg-primary/20 h-7 w-7" onPress={() => executeCommand("pm2-restart", proc.pm_id.toString())} isLoading={isExecuting}>
+                           <RefreshCw size={10} />
+                         </Button>
+                         <Button isIconOnly size="sm" variant="flat" className="bg-danger/10 text-danger hover:bg-danger/20 h-7 w-7" onPress={() => deleteItem(proc.pm_id.toString(), proc.name)} isLoading={isExecuting}>
+                           <Trash2 size={10} />
+                         </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardBody>
+        </Card>
+
+        {/* System Health - 1/3 width */}
+        <Card className="bg-white/5 border-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden border-t-green-500/20 border-t-2">
+          <CardBody className="p-6">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 shadow-inner">
+                <ShieldCheck size={18} />
               </div>
               <div className="flex flex-col">
-                <h3 className="text-xl font-bold text-white tracking-tight">Process Dashboard</h3>
-                <p className="text-[10px] text-zinc-500 font-mono tracking-widest uppercase">VPS Monitor</p>
+                <h3 className="text-lg font-bold text-white tracking-tight">System Health</h3>
+                <p className="text-[9px] text-zinc-500 font-mono tracking-widest uppercase">VPS Telemetry</p>
               </div>
             </div>
-            
-            <Button 
-              size="sm" 
-              variant="flat" 
-              className="bg-white/5 text-zinc-300 border border-white/10 h-10 px-6 font-bold"
-              startContent={<RefreshCw size={14} className={isRefreshingPM2 ? "animate-spin" : ""} />}
-              onPress={fetchProcesses}
-              isLoading={isRefreshingPM2}
-            >
-              Sync Matrix
-            </Button>
-          </div>
 
-          <Table 
-            aria-label="PM2 Processes"
-            className="bg-transparent"
-            removeWrapper
-          >
-            <TableHeader>
-              <TableColumn className="bg-white/5 border-b border-white/10 text-zinc-500 text-[10px] font-bold uppercase tracking-widest">ID / Name</TableColumn>
-              <TableColumn className="bg-white/5 border-b border-white/10 text-zinc-500 text-[10px] font-bold uppercase tracking-widest">Status</TableColumn>
-              <TableColumn className="bg-white/5 border-b border-white/10 text-zinc-500 text-[10px] font-bold uppercase tracking-widest text-center">Resources</TableColumn>
-              <TableColumn className="bg-white/5 border-b border-white/10 text-zinc-500 text-[10px] font-bold uppercase tracking-widest text-right px-6">Actions</TableColumn>
-            </TableHeader>
-            <TableBody emptyContent={isRefreshingPM2 ? "Scanning segments..." : "Matrix idle."}>
-              {processes.map((proc, i) => (
-                <TableRow key={i} className="group hover:bg-white/5 transition-all border-b border-white/5 last:border-0 origin-left">
-                  <TableCell>
-                    <div className="flex items-center gap-4">
-                      <div className="w-8 h-8 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center font-mono text-blue-400 text-xs shadow-inner">
-                        {proc.pm_id}
-                      </div>
-                      <div className="flex flex-col">
-                        <span className="text-sm font-bold text-white tracking-tight">{proc.name}</span>
-                        <span className="text-[10px] text-zinc-500 font-mono">PID {proc.pid}</span>
-                      </div>
+            {!health ? (
+              <div className="flex flex-col items-center justify-center h-[200px] opacity-20">
+                <RefreshCw size={32} className="animate-spin mb-2" />
+                <p className="text-xs font-mono">Sampling infrastructure...</p>
+              </div>
+            ) : (
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <div className="flex justify-between items-end">
+                    <div className="flex items-center gap-2 text-zinc-300">
+                      <Cpu size={14} className="text-blue-500" />
+                      <span className="text-[10px] font-bold uppercase tracking-wider">CPU Utilization</span>
                     </div>
-                  </TableCell>
-                  <TableCell>
-                    <Chip 
-                      size="sm" 
-                      variant="flat" 
-                      color={proc.pm2_env.status === 'online' ? 'success' : 'danger'}
-                      className="capitalize font-bold text-[10px] shadow-sm border border-white/5"
-                      startContent={proc.pm2_env.status === 'online' ? <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse mx-1" /> : null}
-                    >
-                      {proc.pm2_env.status}
-                    </Chip>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center justify-center gap-6">
-                      <div className="flex flex-col items-center">
-                        <div className="flex items-center gap-1 text-zinc-300">
-                          <Cpu size={12} className="text-blue-400 opacity-70" />
-                          <span className="text-xs font-mono font-bold tracking-tighter">{proc.monit.cpu}%</span>
-                        </div>
-                      </div>
-                      <div className="flex flex-col items-center">
-                        <div className="flex items-center gap-1 text-zinc-300">
-                          <Database size={12} className="text-purple-400 opacity-70" />
-                          <span className="text-xs font-mono font-bold tracking-tighter">{(proc.monit.memory / 1024 / 1024).toFixed(1)}MB</span>
-                        </div>
-                      </div>
+                    <span className="text-xs font-mono font-bold text-white">{health.cpu.load}%</span>
+                  </div>
+                  <Progress size="sm" color="primary" value={parseFloat(health.cpu.load)} className="max-w-md h-1.5" />
+                  <p className="text-[8px] text-zinc-600 font-mono text-right italic">{health.cpu.cores} Physical Cores Active</p>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between items-end">
+                    <div className="flex items-center gap-2 text-zinc-300">
+                      <Database size={14} className="text-purple-500" />
+                      <span className="text-[10px] font-bold uppercase tracking-wider">Memory Pressure</span>
                     </div>
-                  </TableCell>
-                  <TableCell className="text-right px-6">
-                    <div className="flex items-center justify-end gap-2">
-                       <Tooltip content="Start" color="success">
-                        <Button 
-                          isIconOnly 
-                          size="sm" 
-                          variant="flat" 
-                          className="bg-green-500/10 text-green-400 hover:bg-green-500/20"
-                          onPress={() => executeCommand("pm2-start", proc.pm_id.toString())}
-                          isDisabled={proc.pm2_env.status === 'online'}
-                          isLoading={isExecuting}
-                        >
-                          <Play size={14} fill="currentColor" />
-                        </Button>
-                      </Tooltip>
-                      <Tooltip content="Restart" color="primary">
-                        <Button 
-                          isIconOnly 
-                          size="sm" 
-                          variant="flat" 
-                          className="bg-blue-500/10 text-blue-400 hover:bg-blue-500/20"
-                          onPress={() => executeCommand("pm2-restart", proc.pm_id.toString())}
-                          isLoading={isExecuting}
-                        >
-                          <RefreshCw size={14} />
-                        </Button>
-                      </Tooltip>
-                      <Tooltip content="Stop" color="warning">
-                        <Button 
-                          isIconOnly 
-                          size="sm" 
-                          variant="flat" 
-                          className="bg-orange-500/10 text-orange-400 hover:bg-orange-500/20"
-                          onPress={() => executeCommand("pm2-stop", proc.pm_id.toString())}
-                          isDisabled={proc.pm2_env.status !== 'online'}
-                          isLoading={isExecuting}
-                        >
-                          <Square size={12} fill="currentColor" />
-                        </Button>
-                      </Tooltip>
-                      <Tooltip content="Delete" color="danger">
-                        <Button 
-                          isIconOnly 
-                          size="sm" 
-                          variant="flat" 
-                          className="bg-red-500/10 text-red-400 hover:bg-red-500/20"
-                          onPress={() => deleteItem(proc.pm_id.toString(), proc.name)}
-                          isLoading={isExecuting}
-                        >
-                          <Trash2 size={12} />
-                        </Button>
-                      </Tooltip>
+                    <span className="text-xs font-mono font-bold text-white">{health.memory.percent}%</span>
+                  </div>
+                  <Progress size="sm" color="secondary" value={parseFloat(health.memory.percent)} className="max-w-md h-1.5" />
+                  <div className="flex justify-between text-[8px] text-zinc-600 font-mono">
+                     <span>{health.memory.used}MB USED</span>
+                     <span>{health.memory.total}MB TOTAL</span>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between items-end">
+                    <div className="flex items-center gap-2 text-zinc-300">
+                      <HardDrive size={14} className="text-orange-500" />
+                      <span className="text-[10px] font-bold uppercase tracking-wider">Root Storage</span>
                     </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardBody>
-      </Card>
+                    <span className="text-xs font-mono font-bold text-white">{health.disk.percent}</span>
+                  </div>
+                  <Progress 
+                    size="sm" 
+                    color={parseInt(health.disk.percent) > 90 ? "danger" : "warning"} 
+                    value={parseInt(health.disk.percent)} 
+                    className="max-w-md h-1.5" 
+                  />
+                   <div className="flex justify-between text-[8px] text-zinc-600 font-mono">
+                     <span>{health.disk.available} AVAILABLE</span>
+                     <span>{health.disk.total} TOTAL</span>
+                  </div>
+                </div>
+
+                <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                   <div className="flex items-center gap-2">
+                      <Clock size={14} className="text-zinc-500" />
+                      <span className="text-[10px] font-bold text-zinc-500 uppercase">Uptime</span>
+                   </div>
+                   <span className="text-xs font-mono font-bold text-green-400">{health.uptime} Hours</span>
+                </div>
+              </div>
+            )}
+          </CardBody>
+        </Card>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-        {/* Project Explorer - Larger now */}
-        <Card className="lg:col-span-3 bg-white/5 border-white/10 backdrop-blur-2xl shadow-2xl border-t-orange-500/20 border-t-2">
+        {/* Project Explorer - 3/4 width */}
+        <Card className="lg:col-span-3 bg-white/5 border-white/10 backdrop-blur-2xl shadow-2xl border-t-zinc-500/20 border-t-2">
           <CardBody className="p-8">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
@@ -420,20 +475,20 @@ const ServerManager = () => {
               
               <Breadcrumbs variant="light" size="sm" classNames={{ list: "gap-1" }}>
                 <BreadcrumbItem onClick={() => handleFolderClick("")}>
-                  <div className="p-1 px-3 rounded-md bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-zinc-400 cursor-pointer">Root</div>
+                  <div className="p-1 px-3 rounded-md bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-zinc-400 cursor-pointer text-[10px]">ROOT</div>
                 </BreadcrumbItem>
                 {breadcrumbItems.map((item, index) => (
                   <BreadcrumbItem 
                     key={index} 
                     onClick={() => handleFolderClick(breadcrumbItems.slice(0, index + 1).join("/"))}
                   >
-                    <div className="p-1 px-3 rounded-md bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-zinc-400 cursor-pointer">{item}</div>
+                    <div className="p-1 px-3 rounded-md bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-zinc-400 cursor-pointer text-[10px] uppercase">{item}</div>
                   </BreadcrumbItem>
                 ))}
               </Breadcrumbs>
             </div>
 
-            <div className="min-h-[700px] border border-white/5 rounded-2xl bg-black/20 overflow-hidden relative">
+            <div className="min-h-[600px] border border-white/5 rounded-2xl bg-black/20 overflow-hidden relative">
               {isLoading && (
                 <div className="absolute inset-0 flex items-center justify-center z-10 backdrop-blur-sm bg-black/20">
                   <Spinner size="lg" color="warning" />
@@ -445,13 +500,9 @@ const ServerManager = () => {
                 className="bg-transparent"
                 removeWrapper
                 selectionMode="single"
-                classNames={{
-                   tr: "cursor-default select-none"
-                }}
               >
                 <TableHeader>
                   <TableColumn className="bg-white/5 border-b border-white/10 text-zinc-500 text-[10px] font-bold uppercase tracking-widest h-12">Name</TableColumn>
-                  <TableColumn className="bg-white/5 border-b border-white/10 text-zinc-500 text-[10px] font-bold uppercase tracking-widest h-12">Type</TableColumn>
                   <TableColumn className="bg-white/5 border-b border-white/10 text-zinc-500 text-[10px] font-bold uppercase tracking-widest h-12 text-right px-8">Actions</TableColumn>
                 </TableHeader>
                 <TableBody emptyContent={"Segment is empty."}>
@@ -463,38 +514,25 @@ const ServerManager = () => {
                     >
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className={`p-2 rounded-lg ${file.isDir ? "bg-[#00D5FF]/10 text-[#00D5FF]" : "bg-zinc-500/10 text-zinc-400"} shadow-inner`}>
-                            {file.isDir ? <Folder size={16} /> : <FileText size={16} />}
+                          <div className={`p-2 rounded-lg ${file.isDir ? "bg-[#00D5FF]/10 text-[#00D5FF]" : "bg-zinc-500/10 text-zinc-400"}`}>
+                            {file.isDir ? <Folder size={14} /> : <FileText size={14} />}
                           </div>
                           <div className="flex flex-col">
-                            <span className={`text-sm font-semibold tracking-tight ${file.isDir ? "text-white" : "text-zinc-300"}`}>
-                              {file.name}
-                            </span>
+                            <span className="text-xs font-semibold text-white">{file.name}</span>
                           </div>
                         </div>
                       </TableCell>
-                      <TableCell>
-                        <span className="text-[10px] text-zinc-600 font-mono bg-white/5 px-2 py-0.5 rounded border border-white/5">
-                          {file.isDir ? "FOLDER" : file.name.split('.').pop()?.toUpperCase() || "UNIT"}
-                        </span>
-                      </TableCell>
                       <TableCell className="text-right px-8">
                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Tooltip content="Edit / View" size="sm">
-                             <Button isIconOnly size="sm" variant="light" className="text-zinc-500 hover:text-white" onPress={() => file.isDir ? handleFolderClick(file.path) : handleFileView(file)}>
-                               {file.isDir ? <ChevronRight size={16} /> : <Edit size={14} />}
-                             </Button>
-                          </Tooltip>
-                          <Tooltip content="Rename / Move" size="sm" color="primary">
-                             <Button isIconOnly size="sm" variant="light" className="text-zinc-500 hover:text-blue-400" onPress={() => moveItem(file.path, file.name)}>
-                               <Move size={14} />
-                             </Button>
-                          </Tooltip>
-                          <Tooltip content="Delete permanently" size="sm" color="danger">
-                             <Button isIconOnly size="sm" variant="light" className="text-zinc-500 hover:text-red-400" onPress={() => deleteItem(file.path, file.name)}>
-                               <Trash2 size={14} />
-                             </Button>
-                          </Tooltip>
+                          <Button isIconOnly size="sm" variant="light" className="text-zinc-500 hover:text-white" onPress={() => file.isDir ? handleFolderClick(file.path) : handleFileView(file)}>
+                            {file.isDir ? <RefreshCw size={12} /> : <Edit size={12} />}
+                          </Button>
+                          <Button isIconOnly size="sm" variant="light" className="text-zinc-500 hover:text-blue-400" onPress={() => moveItem(file.path, file.name)}>
+                            <Move size={12} />
+                          </Button>
+                          <Button isIconOnly size="sm" variant="light" className="text-zinc-500 hover:text-red-400" onPress={() => deleteItem(file.path, file.name)}>
+                            <Trash2 size={12} />
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -505,79 +543,74 @@ const ServerManager = () => {
           </CardBody>
         </Card>
 
-        {/* Console & Maintenance */}
+        {/* Maintenance Deck - 1/4 width */}
         <div className="lg:col-span-1 space-y-6">
-          <Card className="bg-white/5 border-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden border-t-purple-500/20 border-t-2">
-            <CardBody className="p-8 space-y-6">
+          <Card className="bg-white/5 border-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden border-t-blue-500/20 border-t-2">
+            <CardBody className="p-6 space-y-6">
               <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 shadow-inner">
-                  <Terminal size={20} />
+                <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 shadow-inner">
+                  <Terminal size={18} />
                 </div>
-                <h3 className="text-xl font-bold text-white">Maintenance</h3>
+                <h3 className="text-lg font-bold text-white">Maintenance</h3>
               </div>
 
               <div className="space-y-4">
                  <div className="flex flex-col gap-2">
                     <Input 
                       size="sm" 
-                      placeholder="Repository Link"
+                      placeholder="Git URL for Clone"
                       value={gitUrl}
                       onChange={(e) => setGitUrl(e.target.value)}
-                      classNames={{ inputWrapper: "bg-white/5 border-white/10 h-10" }}
-                      startContent={<History size={14} className="text-zinc-500" />}
+                      classNames={{ inputWrapper: "bg-white/5 border-white/10 h-8 text-[11px]" }}
                     />
-                    <Button variant="flat" className="bg-blue-500/10 text-blue-400 font-bold h-10" onPress={() => executeCommand("git-clone")} isLoading={isExecuting}>CLONE REPO</Button>
+                    <Button size="sm" variant="flat" className="bg-blue-500/10 text-blue-400 font-bold" onPress={() => executeCommand("git-clone")} isLoading={isExecuting}>GENESIS CLONE</Button>
                  </div>
 
                  <div className="grid grid-cols-2 gap-2">
-                    <Button variant="flat" size="sm" className="bg-white/5 text-zinc-400 h-10" startContent={<Download size={14} />} onPress={() => executeCommand("git-pull")} isLoading={isExecuting}>PULL</Button>
-                    <Button variant="flat" size="sm" className="bg-white/5 text-zinc-400 h-10" startContent={<RefreshCw size={14} />} onPress={() => executeCommand("git-restore")} isLoading={isExecuting}>RESET</Button>
+                    <Button variant="flat" size="sm" className="bg-white/5 text-zinc-400 h-8 text-[10px]" startContent={<Download size={12} />} onPress={() => executeCommand("git-pull")} isLoading={isExecuting}>PULL</Button>
+                    <Button variant="flat" size="sm" className="bg-white/5 text-zinc-400 h-8 text-[10px]" startContent={<RefreshCw size={12} />} onPress={() => executeCommand("git-restore")} isLoading={isExecuting}>RESET</Button>
                  </div>
 
-                 <div className="flex flex-col gap-2 py-2">
-                    <p className="text-[10px] text-zinc-600 font-mono tracking-tighter truncate px-1">ROOT: <span className="text-blue-500">/{currentPath || 'vps'}</span></p>
-                    <Button variant="flat" className="bg-green-500/10 text-green-400 font-bold h-10" startContent={<Package size={16} />} onPress={() => executeCommand("npm-install")} isLoading={isExecuting}>NPM INSTALL</Button>
-                    <Button variant="flat" className="bg-purple-500/10 text-purple-400 font-bold h-10" startContent={<ArrowUpCircle size={16} />} onPress={() => executeCommand("npm-build")} isLoading={isExecuting}>PRODUCTION BUILD</Button>
+                 <div className="space-y-2 pt-2">
+                    <Button size="sm" variant="flat" className="bg-green-500/10 text-green-400 font-bold w-full" startContent={<Package size={14} />} onPress={() => executeCommand("npm-install")} isLoading={isExecuting}>NPM INSTALL</Button>
+                    <Button size="sm" variant="flat" className="bg-purple-500/10 text-purple-400 font-bold w-full" startContent={<ArrowUpCircle size={14} />} onPress={() => executeCommand("npm-build")} isLoading={isExecuting}>DEPLOY BUILD</Button>
                  </div>
               </div>
 
-              <div className="pt-4 border-t border-white/5 space-y-3">
-                 <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest pl-1 opacity-50">Database Engine</p>
-                 <div className="flex flex-col gap-2">
-                    <Button size="sm" variant="flat" className="bg-white/5 text-zinc-400 font-bold" onPress={() => executeCommand("prisma-generate")} isLoading={isExecuting}>PRISMA GENERATE</Button>
-                    <Button size="sm" variant="flat" className="bg-white/5 text-zinc-400 font-bold" onPress={() => executeCommand("prisma-migrate")} isLoading={isExecuting}>PRISMA MIGRATE</Button>
-                 </div>
+              <div className="pt-4 border-t border-white/5 space-y-2">
+                 <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest pl-1">Prisma Deck</p>
+                 <Button size="sm" variant="flat" className="bg-white/5 text-zinc-400 font-bold w-full text-[10px]" onPress={() => executeCommand("prisma-generate")} isLoading={isExecuting}>SCHEMA SYNC</Button>
+                 <Button size="sm" variant="flat" className="bg-white/5 text-zinc-400 font-bold w-full text-[10px]" onPress={() => executeCommand("prisma-migrate")} isLoading={isExecuting}>DEPLOY MIGRATION</Button>
               </div>
             </CardBody>
           </Card>
 
           <Card className="bg-zinc-950 border-white/5 shadow-2xl border-t-2 border-t-green-500/20">
             <CardBody className="p-0">
-               <div className="p-4 bg-white/5 border-b border-white/5 flex items-center justify-between">
+               <div className="p-3 bg-white/5 border-b border-white/5 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                     <div className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                     <span className="text-[10px] font-bold text-zinc-500 uppercase">Static Console</span>
+                     <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                     <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">Shell Console</span>
                   </div>
-                  <button onClick={() => setLogs([])} className="text-[10px] text-zinc-600 hover:text-white transition-colors">CLS</button>
+                  <button onClick={() => setLogs([])} className="text-[9px] text-zinc-700 hover:text-white">CLEAR</button>
                </div>
-               <div className="h-[300px] p-6 font-mono text-[10px] overflow-y-auto text-green-400/80 bg-black/40">
-                  {logs.length === 0 ? <p className="opacity-20 italic">Link secured. Direct shell active.</p> : null}
+               <div className="h-[250px] p-4 font-mono text-[9px] overflow-y-auto text-green-400/80 bg-black/40">
                   <div className="space-y-1">
-                    {logs.map((log, i) => <div key={i} className="flex gap-2"><span className="opacity-30">{i+1}</span>{log}</div>)}
+                    {logs.map((log, i) => <div key={i} className="flex gap-2"><span className="opacity-20">{i+1}</span>{log}</div>)}
                     <div ref={logEndRef} className="w-1.5 h-3 bg-green-500 animate-pulse mt-1" />
                   </div>
                </div>
-               <div className="p-2 px-4 bg-zinc-900/50 border-t border-white/5 flex gap-2 items-center">
-                  <PlayCircle size={14} className="text-zinc-600" />
+               <div className="p-2 px-3 bg-zinc-900/50 border-t border-white/5 flex gap-2 items-center">
+                  <PlayCircle size={12} className="text-zinc-600" />
                   <Input 
                     size="sm" 
                     variant="underlined" 
-                    placeholder="Raw Command..." 
+                    placeholder="Direct Shell Link..." 
                     className="flex-1"
                     value={rawCommand}
                     onChange={(e) => setRawCommand(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && executeCommand("raw")}
-                    classNames={{ input: "text-zinc-300 font-mono text-[11px]" }}
+                    classNames={{ input: "text-zinc-400 font-mono text-[10px] h-6" }}
                   />
                </div>
             </CardBody>
@@ -593,52 +626,73 @@ const ServerManager = () => {
         scrollBehavior="inside"
         classNames={{
           base: "bg-zinc-950 border border-white/10 text-white shadow-2xl",
-          header: "border-b border-white/5 py-6 px-10",
+          header: "border-b border-white/5 py-4 px-8",
           body: "p-0",
           footer: "border-t border-white/5 p-4",
           closeButton: "hover:bg-white/10 text-zinc-500 m-4"
         }}
       >
         <ModalContent>
-          <ModalHeader className="flex items-center justify-between gap-4">
-             <div className="flex items-center gap-4">
-               <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-inner">
-                 <FileText size={22} />
+          <ModalHeader className="flex flex-col gap-4">
+             <div className="flex items-center justify-between gap-4">
+               <div className="flex items-center gap-4">
+                 <div className="p-2 rounded-xl bg-blue-500/10 text-blue-400 border border-blue-500/20 shadow-inner">
+                   <FileText size={18} />
+                 </div>
+                 <div className="flex flex-col">
+                   <span className="text-lg font-bold text-white tracking-tight">{selectedFileName}</span>
+                   <p className="text-[9px] text-zinc-500 font-mono uppercase tracking-widest">Source Edit Mode</p>
+                 </div>
                </div>
-               <div className="flex flex-col">
-                 <span className="text-xl font-bold text-white tracking-tight">{selectedFileName}</span>
-                 <span className="text-[10px] text-zinc-500 font-mono uppercase tracking-widest mt-0.5">Application Context / Source Stream</span>
+               <div className="pr-10">
+                  <Button 
+                    color="primary" 
+                    size="sm" 
+                    className="font-bold shadow-lg shadow-blue-500/20 h-8"
+                    startContent={<Save size={14} />}
+                    onPress={saveFile}
+                    isLoading={isSaving}
+                  >
+                    COMMIT CHANGES
+                  </Button>
                </div>
              </div>
-             <div className="pr-12">
-                <Button 
-                  color="primary" 
-                  size="sm" 
-                  className="font-bold shadow-lg shadow-blue-500/20"
-                  startContent={<Save size={16} />}
-                  onPress={saveFile}
-                  isLoading={isSaving}
-                >
-                  SAVE CHANGES
-                </Button>
-             </div>
+             <div className="pt-4 mt-2 border-t border-white/5 flex gap-2">
+                  <Input 
+                    size="sm" 
+                    placeholder="PM2 Name / ID" 
+                    className="w-1/2"
+                    classNames={{
+                      input: "bg-transparent text-white",
+                      inputWrapper: "bg-white/5 border-white/10 group-data-[focus=true]:border-blue-500/50 h-10 text-xs"
+                    }}
+                  />
+                  <Button 
+                    color="primary"
+                    className="flex-1 font-bold shadow-lg shadow-blue-500/20 h-10 text-xs"
+                    onPress={() => {
+                        const input = document.querySelector('input[placeholder="PM2 Name / ID"]') as HTMLInputElement;
+                        if (input) executeCommand("pm2-restart", input.value);
+                    }}
+                    isLoading={isExecuting}
+                  >
+                    Quick Restart
+                  </Button>
+                </div>
           </ModalHeader>
           <ModalBody>
-            <div className="bg-black/80 min-h-[600px] relative mt-0.5 group">
-              <div className="absolute top-0 left-0 w-12 h-full bg-white/5 border-r border-white/10 flex flex-col items-center pt-8 text-[10px] text-zinc-700 font-mono select-none">
+            <div className="bg-black/90 min-h-[500px] relative group border-t border-white/5">
+              <div className="absolute top-0 left-0 w-10 h-full bg-white/5 border-r border-white/10 flex flex-col items-center pt-6 text-[9px] text-zinc-700 font-mono select-none">
                 {editingContent.split('\n').map((_, i) => (
-                  <div key={i} className="h-6 leading-6">{i + 1}</div>
+                  <div key={i} className="h-5 leading-5">{i + 1}</div>
                 ))}
               </div>
               <textarea
-                className="w-full h-full bg-transparent pl-16 p-8 font-mono text-[13px] leading-6 text-zinc-300 outline-none resize-none min-h-[600px] scrollbar-thin scrollbar-thumb-white/10"
+                className="w-full h-full bg-transparent pl-14 p-6 font-mono text-[12px] leading-5 text-zinc-300 outline-none resize-none min-h-[500px] scrollbar-thin scrollbar-thumb-white/10"
                 value={editingContent}
                 onChange={(e) => setEditingContent(e.target.value)}
                 spellCheck={false}
               />
-              <div className="absolute bottom-4 right-4 text-[10px] text-zinc-700 font-mono opacity-0 group-hover:opacity-100 transition-opacity">
-                UTF-8 | LF | {selectedFileName.split('.').pop()?.toUpperCase() || 'UNIT'}
-              </div>
             </div>
           </ModalBody>
         </ModalContent>
