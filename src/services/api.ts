@@ -125,6 +125,18 @@ export const adminService = {
     const { data } = await api.get(`/admin/server/file?path=${path}`);
     return data.data;
   },
+  saveServerFile: async (path: string, content: string) => {
+    const { data } = await api.post("/admin/server/file/save", { path, content });
+    return data;
+  },
+  moveServerFile: async (oldPath: string, newPath: string) => {
+    const { data } = await api.post("/admin/server/file/move", { oldPath, newPath });
+    return data;
+  },
+  deleteServerFile: async (path: string) => {
+    const { data } = await api.delete(`/admin/server/file?path=${path}`);
+    return data;
+  },
   getPm2Processes: async () => {
     const { data } = await api.get("/admin/server/pm2");
     return data.data;
