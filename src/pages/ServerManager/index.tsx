@@ -54,7 +54,9 @@ interface ServerFile {
 interface PM2Process {
   pm_id: number;
   name: string;
-  status: string;
+  pm2_env: {
+    status: string;
+  };
   monit: {
     memory: number;
     cpu: number;
@@ -252,11 +254,11 @@ const ServerManager = () => {
                     <Chip 
                       size="sm" 
                       variant="flat" 
-                      color={proc.status === 'online' ? 'success' : 'danger'}
+                      color={proc.pm2_env.status === 'online' ? 'success' : 'danger'}
                       className="capitalize font-bold text-[10px] shadow-sm border border-white/5"
-                      startContent={proc.status === 'online' ? <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse mx-1" /> : null}
+                      startContent={proc.pm2_env.status === 'online' ? <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse mx-1" /> : null}
                     >
-                      {proc.status}
+                      {proc.pm2_env.status}
                     </Chip>
                   </TableCell>
                   <TableCell>
@@ -284,7 +286,7 @@ const ServerManager = () => {
                           variant="flat" 
                           className="bg-green-500/10 text-green-400 hover:bg-green-500/20"
                           onPress={() => executeCommand("pm2-start", proc.pm_id.toString())}
-                          isDisabled={proc.status === 'online'}
+                          isDisabled={proc.pm2_env.status === 'online'}
                           isLoading={isExecuting}
                         >
                           <Play size={14} fill="currentColor" />
@@ -309,7 +311,7 @@ const ServerManager = () => {
                           variant="flat" 
                           className="bg-orange-500/10 text-orange-400 hover:bg-orange-500/20"
                           onPress={() => executeCommand("pm2-stop", proc.pm_id.toString())}
-                          isDisabled={proc.status !== 'online'}
+                          isDisabled={proc.pm2_env.status !== 'online'}
                           isLoading={isExecuting}
                         >
                           <Square size={12} fill="currentColor" />
