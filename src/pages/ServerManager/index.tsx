@@ -33,7 +33,6 @@ import {
   Trash2,
   Cpu,
   Database,
-  Play,
   PlayCircle,
   Edit,
   Save,
@@ -50,7 +49,19 @@ import {
   Layout,
   Code2,
   Globe,
-  FileArchive
+  FileArchive,
+  Power,
+  RotateCcw,
+  Zap,
+  GitFork,
+  GitPullRequest,
+  Rocket,
+  ShieldAlert,
+  Search,
+  Box,
+  ChevronRight,
+  DatabaseBackup,
+  Undo2
 } from "lucide-react";
 import { adminService } from "../../services/api";
 import { toast } from "sonner";
@@ -406,6 +417,7 @@ const ServerManager = () => {
                         variant="flat" 
                         color={proc.pm2_env.status === 'online' ? 'success' : 'danger'}
                         className="capitalize font-bold text-[9px] h-5"
+                        startContent={proc.pm2_env.status === 'online' ? <div className="w-1.5 h-1.5 rounded-full bg-success animate-pulse mx-1" /> : null}
                       >
                         {proc.pm2_env.status}
                       </Chip>
@@ -423,13 +435,13 @@ const ServerManager = () => {
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-1">
                          <Button isIconOnly size="sm" variant="flat" className="bg-success/10 text-success hover:bg-success/20 h-7 w-7" onPress={() => executeCommand("pm2-start", proc.pm_id.toString())} isDisabled={proc.pm2_env.status === 'online'} isLoading={isExecuting}>
-                           <Play size={10} fill="currentColor" />
+                           <Power size={11} />
                          </Button>
                          <Button isIconOnly size="sm" variant="flat" className="bg-primary/10 text-primary hover:bg-primary/20 h-7 w-7" onPress={() => executeCommand("pm2-restart", proc.pm_id.toString())} isLoading={isExecuting}>
-                           <RefreshCw size={10} />
+                           <Zap size={11} fill="currentColor" />
                          </Button>
                          <Button isIconOnly size="sm" variant="flat" className="bg-danger/10 text-danger hover:bg-danger/20 h-7 w-7" onPress={() => deleteItem(proc.pm_id.toString(), proc.name)} isLoading={isExecuting}>
-                           <Trash2 size={10} />
+                           <ShieldAlert size={11} />
                          </Button>
                       </div>
                     </TableCell>
@@ -541,7 +553,7 @@ const ServerManager = () => {
                     key={index} 
                     onClick={() => handleFolderClick(breadcrumbItems.slice(0, index + 1).join("/"))}
                   >
-                    <div className="p-1 px-3 rounded-md bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-zinc-400 cursor-pointer text-[10px] uppercase">{item}</div>
+                    <div className="p-1 px-3 rounded-md bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-zinc-400 cursor-pointer text-[10px] uppercase tracking-wider">{item}</div>
                   </BreadcrumbItem>
                 ))}
               </Breadcrumbs>
@@ -589,7 +601,7 @@ const ServerManager = () => {
                       <TableCell className="text-right px-8">
                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                           <Button isIconOnly size="sm" variant="light" className="text-zinc-500 hover:text-white" onPress={() => file.isDir ? handleFolderClick(file.path) : handleFileView(file)}>
-                            {file.isDir ? <RefreshCw size={12} /> : <Edit size={12} />}
+                            {file.isDir ? <Search size={12} /> : <Edit size={12} />}
                           </Button>
                           <Button isIconOnly size="sm" variant="light" className="text-zinc-500 hover:text-blue-400" onPress={() => moveItem(file.path, file.name)}>
                             <Move size={12} />
@@ -627,24 +639,36 @@ const ServerManager = () => {
                       onChange={(e) => setGitUrl(e.target.value)}
                       classNames={{ inputWrapper: "bg-white/5 border-white/10 h-8 text-[11px]" }}
                     />
-                    <Button size="sm" variant="flat" className="bg-blue-500/10 text-blue-400 font-bold" onPress={() => executeCommand("git-clone")} isLoading={isExecuting}>GENESIS CLONE</Button>
+                    <Button 
+                      size="sm" 
+                      variant="flat" 
+                      className="bg-blue-500/10 text-blue-400 font-bold h-9" 
+                      startContent={<GitFork size={14} />} 
+                      onPress={() => executeCommand("git-clone")} 
+                      isLoading={isExecuting}
+                    >
+                      GENESIS CLONE
+                    </Button>
                  </div>
 
                  <div className="grid grid-cols-2 gap-2">
-                    <Button variant="flat" size="sm" className="bg-white/5 text-zinc-400 h-8 text-[10px]" startContent={<Download size={12} />} onPress={() => executeCommand("git-pull")} isLoading={isExecuting}>PULL</Button>
-                    <Button variant="flat" size="sm" className="bg-white/5 text-zinc-400 h-8 text-[10px]" startContent={<RefreshCw size={12} />} onPress={() => executeCommand("git-restore")} isLoading={isExecuting}>RESET</Button>
+                    <Button variant="flat" size="sm" className="bg-white/5 text-zinc-400 h-8 text-[10px]" startContent={<GitPullRequest size={12} />} onPress={() => executeCommand("git-pull")} isLoading={isExecuting}>PULL</Button>
+                    <Button variant="flat" size="sm" className="bg-white/5 text-zinc-400 h-8 text-[10px]" startContent={<Undo2 size={12} />} onPress={() => executeCommand("git-restore")} isLoading={isExecuting}>RESET</Button>
                  </div>
 
                  <div className="space-y-2 pt-2">
-                    <Button size="sm" variant="flat" className="bg-green-500/10 text-green-400 font-bold w-full" startContent={<Package size={14} />} onPress={() => executeCommand("npm-install")} isLoading={isExecuting}>NPM INSTALL</Button>
-                    <Button size="sm" variant="flat" className="bg-purple-500/10 text-purple-400 font-bold w-full" startContent={<ArrowUpCircle size={14} />} onPress={() => executeCommand("npm-build")} isLoading={isExecuting}>DEPLOY BUILD</Button>
+                    <Button size="sm" variant="flat" className="bg-green-500/10 text-green-400 font-bold w-full h-9" startContent={<Box size={14} />} onPress={() => executeCommand("npm-install")} isLoading={isExecuting}>NPM INSTALL</Button>
+                    <Button size="sm" variant="flat" className="bg-purple-500/10 text-purple-400 font-bold w-full h-9" startContent={<Rocket size={14} />} onPress={() => executeCommand("npm-build")} isLoading={isExecuting}>DEPLOY BUILD</Button>
                  </div>
               </div>
 
               <div className="pt-4 border-t border-white/5 space-y-2">
-                 <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest pl-1">Prisma Deck</p>
-                 <Button size="sm" variant="flat" className="bg-white/5 text-zinc-400 font-bold w-full text-[10px]" onPress={() => executeCommand("prisma-generate")} isLoading={isExecuting}>SCHEMA SYNC</Button>
-                 <Button size="sm" variant="flat" className="bg-white/5 text-zinc-400 font-bold w-full text-[10px]" onPress={() => executeCommand("prisma-migrate")} isLoading={isExecuting}>DEPLOY MIGRATION</Button>
+                 <div className="flex items-center justify-between pl-1">
+                    <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest ">Prisma Engine</p>
+                    <Database size={10} className="text-zinc-600" />
+                 </div>
+                 <Button size="sm" variant="flat" className="bg-white/5 text-zinc-400 font-bold w-full text-[10px] h-8" startContent={<DatabaseBackup size={12} />} onPress={() => executeCommand("prisma-generate")} isLoading={isExecuting}>SCHEMA SYNC</Button>
+                 <Button size="sm" variant="flat" className="bg-white/5 text-zinc-400 font-bold w-full text-[10px] h-8" startContent={<ChevronRight size={12} />} onPress={() => executeCommand("prisma-migrate")} isLoading={isExecuting}>MIGRATE EXEC</Button>
               </div>
             </CardBody>
           </Card>
@@ -665,7 +689,7 @@ const ServerManager = () => {
                   </div>
                </div>
                <div className="p-2 px-3 bg-zinc-900/50 border-t border-white/5 flex gap-2 items-center">
-                  <PlayCircle size={12} className="text-zinc-600" />
+                  <Terminal size={12} className="text-zinc-600" />
                   <Input 
                     size="sm" 
                     variant="underlined" 
@@ -734,6 +758,7 @@ const ServerManager = () => {
                   <Button 
                     color="primary"
                     className="flex-1 font-bold shadow-lg shadow-blue-500/20 h-10 text-xs"
+                    startContent={<Zap size={12} fill="currentColor" />}
                     onPress={() => {
                         const input = document.querySelector('input[placeholder="PM2 Name / ID"]') as HTMLInputElement;
                         if (input) executeCommand("pm2-restart", input.value);
