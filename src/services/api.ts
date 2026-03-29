@@ -115,4 +115,18 @@ export const adminService = {
     const { data } = await api.post("/car-rental/photos/bulk-delete", { ids: photoIds });
     return data.data;
   },
+
+  // Server Management
+  getServerFiles: async (path?: string) => {
+    const { data } = await api.get(`/admin/server/files?path=${path || ""}`);
+    return data.data;
+  },
+  getFileContent: async (path: string) => {
+    const { data } = await api.get(`/admin/server/file?path=${path}`);
+    return data.data;
+  },
+  executeServerCommand: async (action: string, id?: string, customPath?: string) => {
+    const { data } = await api.post("/admin/server/execute", { action, id, customPath });
+    return data.data;
+  },
 };
