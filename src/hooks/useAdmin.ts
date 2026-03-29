@@ -35,6 +35,7 @@ export interface Car {
   type: string;
   rows: number;
   pricePerDay: number;
+  pricingDuration?: string;
   available: boolean;
   description?: string;
   transmission?: string;

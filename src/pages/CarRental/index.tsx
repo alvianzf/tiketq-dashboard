@@ -21,6 +21,10 @@ import {
   CardBody,
   Chip,
   Tooltip,
+  RadioGroup,
+  Radio,
+  CheckboxGroup,
+  Checkbox,
 } from "@nextui-org/react";
 import { Plus, Search, Edit2, Trash2, Car as CarIcon, Upload, X, Camera, Check } from "lucide-react";
 import { useState, useRef } from "react";
@@ -31,6 +35,15 @@ import { useCars, useCarMutation, type Car } from "../../hooks/useAdmin";
 import { confirmDelete } from "../../utils/swal";
 
 const carTypes = ["City Car", "Sedan", "SUV", "MPV", "Minibus", "Pick-up", "Double Cabin", "Van"];
+const durationTypes = ["Hari", "12 Jam", "Minggu", "Bulan"];
+const CAR_FEATURES = [
+  { value: "AC Dingin", label: "AC Dingin", icon: "❄️" },
+  { value: "Supir Ramah", label: "Supir Ramah", icon: "👨‍✈️" },
+  { value: "Termasuk BBM", label: "Termasuk BBM", icon: "⛽" },
+  { value: "Audio Premium", label: "Audio Premium", icon: "🎵" },
+  { value: "Air Mineral", label: "Air Mineral", icon: "💧" },
+  { value: "Kabin Bersih", label: "Kabin Bersih", icon: "✨" },
+];
 
 const MODAL_CLASSES = {
   base: "bg-zinc-900/80 border border-white/10 shadow-2xl backdrop-blur-2xl",
@@ -58,9 +71,11 @@ const CarRentalPage = () => {
     name: "",
     type: "SUV",
     pricePerDay: 500000,
+    pricingDuration: "Hari",
     rows: 3,
     description: "",
     transmission: "Automatic",
+    features: [] as string[],
   });
 
   const [selectedPhotos, setSelectedPhotos] = useState<File[]>([]);
@@ -68,7 +83,7 @@ const CarRentalPage = () => {
 
   const handleOpenAdd = () => {
     setEditingCar(null);
-    setFormState({ name: "", type: "SUV", pricePerDay: 500000, rows: 3, description: "", transmission: "Automatic" });
+    setFormState({ name: "", type: "SUV", pricePerDay: 500000, pricingDuration: "Hari", rows: 3, description: "", transmission: "Automatic", features: [] });
     setSelectedPhotos([]);
     setPhotoPreviews([]);
     onOpen();
@@ -80,9 +95,11 @@ const CarRentalPage = () => {
       name: car.name,
       type: car.type,
       pricePerDay: car.pricePerDay,
+      pricingDuration: car.pricingDuration || "Hari",
       rows: car.rows,
       description: car.description || "",
       transmission: car.transmission || "Automatic",
+      features: car.features || [],
     });
     setSelectedPhotos([]);
     setPhotoPreviews([]);
@@ -197,7 +214,7 @@ const CarRentalPage = () => {
         toast.success("Photos uploaded successfully");
       }
       
-      setFormState({ name: "", type: "SUV", pricePerDay: 500000, rows: 3, description: "", transmission: "Automatic" });
+      setFormState({ name: "", type: "SUV", pricePerDay: 500000, pricingDuration: "Hari", rows: 3, description: "", transmission: "Automatic", features: [] });
       setSelectedPhotos([]);
       setPhotoPreviews([]);
       onClose();
@@ -262,7 +279,7 @@ const CarRentalPage = () => {
               <TableColumn>CAR</TableColumn>
               <TableColumn>TYPE</TableColumn>
               <TableColumn>ROWS</TableColumn>
-              <TableColumn>DAILY PRICE</TableColumn>
+              <TableColumn>PRICE</TableColumn>
               <TableColumn>STATUS</TableColumn>
               <TableColumn align="center">ACTIONS</TableColumn>
             </TableHeader>
@@ -297,7 +314,7 @@ const CarRentalPage = () => {
                   <TableCell>
                     <div className="flex flex-col">
                       <span className="font-bold text-[#00D5FF]">Rp {Number(car.pricePerDay).toLocaleString("id-ID")}</span>
-                      <span className="text-[10px] text-zinc-600 uppercase tracking-wider">per day</span>
+                      <span className="text-[10px] text-zinc-600 uppercase tracking-wider">per {car.pricingDuration || 'Hari'}</span>
                     </div>
                   </TableCell>
                   <TableCell>
@@ -401,7 +418,7 @@ const CarRentalPage = () => {
 
                 <div className="grid grid-cols-2 gap-5 mt-1">
                   <Input
-                    label="Price per Day (IDR)"
+                    label="Price per Duration (IDR)"
                     placeholder="e.g. 500000"
                     type="number"
                     variant="bordered"
@@ -410,6 +427,35 @@ const CarRentalPage = () => {
                     onValueChange={(v) => setFormState((p) => ({ ...p, pricePerDay: Number(v) }))}
                     description={formState.pricePerDay > 0 ? `Rp ${Number(formState.pricePerDay).toLocaleString("id-ID")}` : ""}
                   />
+                  <Select
+                    label="Pricing Duration"
+                    placeholder="Select duration"
+                    variant="bordered"
+                    classNames={{
+                      label: "text-zinc-400 font-medium pb-5",
+                      value: "text-white",
+                      trigger: "border-white/10 hover:border-white/20 bg-white/5",
+                    }}
+                    popoverProps={{
+                      classNames: {
+                        base: "bg-zinc-900 border border-white/10 backdrop-blur-2xl shadow-2xl",
+                      }
+                    }}
+                    listboxProps={{
+                      itemClasses: {
+                        base: "text-white data-[hover=true]:bg-white/10 data-[selectable=true]:focus:bg-white/10",
+                      }
+                    }}
+                    selectedKeys={formState.pricingDuration ? [formState.pricingDuration] : []}
+                    onSelectionChange={(v) => setFormState((p) => ({ ...p, pricingDuration: Array.from(v)[0] as string || p.pricingDuration }))}
+                  >
+                    {durationTypes.map((type) => (
+                      <SelectItem key={type}>{type}</SelectItem>
+                    ))}
+                  </Select>
+                </div>
+
+                <div className="grid grid-cols-2 gap-5 mt-1">
                   <Input
                     label="Number of Seat Rows"
                     placeholder="e.g. 3"
@@ -419,6 +465,34 @@ const CarRentalPage = () => {
                     value={formState.rows.toString()}
                     onValueChange={(v) => setFormState((p) => ({ ...p, rows: Number(v) }))}
                   />
+                  <div className="flex flex-col gap-2">
+                    <label className="text-zinc-400 font-medium pb-1.5 text-sm">Transmission</label>
+                    <RadioGroup
+                        orientation="horizontal"
+                        value={formState.transmission}
+                        onValueChange={(v) => setFormState((p) => ({ ...p, transmission: v }))}
+                        classNames={{ wrapper: "gap-6" }}
+                    >
+                        <Radio value="Automatic" classNames={{ label: "text-zinc-300" }}>Automatic</Radio>
+                        <Radio value="Manual" classNames={{ label: "text-zinc-300" }}>Manual</Radio>
+                    </RadioGroup>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2 mt-4">
+                  <label className="text-zinc-400 font-medium text-sm">Fasilitas & Fitur</label>
+                  <CheckboxGroup
+                    orientation="horizontal"
+                    value={formState.features}
+                    onValueChange={(v) => setFormState((p) => ({ ...p, features: v }))}
+                    classNames={{ wrapper: "gap-4 grid grid-cols-3" }}
+                  >
+                    {CAR_FEATURES.map((feature) => (
+                      <Checkbox key={feature.value} value={feature.value} classNames={{ label: "text-zinc-300 text-sm" }}>
+                        <span className="mr-1">{feature.icon}</span> {feature.label}
+                      </Checkbox>
+                    ))}
+                  </CheckboxGroup>
                 </div>
 
                 <div className="flex flex-col gap-2 mt-2">
