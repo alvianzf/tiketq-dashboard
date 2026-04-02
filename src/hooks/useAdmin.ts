@@ -4,13 +4,34 @@ import { adminService } from "../services/api";
 export interface Transaction {
   id: number;
   serviceType: string;
+  bookingCode?: string;
   email: string;
   totalSales: number;
   status: string;
   createdAt: string;
-  flightBooking?: { name?: string };
-  ferryBooking?: { mobile_number?: string };
-  carRentalRequest?: { fullName?: string };
+  flightBooking?: { 
+    id: number;
+    name?: string; 
+    origin?: string;
+    destination?: string;
+    departureDate?: string;
+    passengers?: any[];
+  };
+  ferryBooking?: { 
+    id: number;
+    mobile_number?: string; 
+    origin?: { name: string };
+    destination?: { name: string };
+    departureDate?: string;
+    passengers?: any[];
+  };
+  carRentalRequest?: { 
+    id: number;
+    fullName?: string; 
+    date?: string;
+    rentalDays?: number;
+    car?: { name: string; type: string };
+  };
 }
 
 export interface Stats {
