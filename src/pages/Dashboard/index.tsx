@@ -26,15 +26,6 @@ import UpcomingSchedules from "../../components/UpcomingSchedules";
 
 const DashboardPage = () => {
   const { data: statsData, isLoading } = useStats();
-
-  if (isLoading) {
-    return (
-      <div className="flex h-[400px] items-center justify-center">
-        <Spinner size="lg" color="primary" />
-      </div>
-    );
-  }
-
   const [onlineVisitors, setOnlineVisitors] = useState<number>(0);
 
   useEffect(() => {
@@ -49,6 +40,14 @@ const DashboardPage = () => {
       socket.disconnect();
     };
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className="flex h-[400px] items-center justify-center">
+        <Spinner size="lg" color="primary" />
+      </div>
+    );
+  }
 
   const successRate = statsData && statsData.totalTransactions > 0
     ? `${((statsData.successfulTransactions / statsData.totalTransactions) * 100).toFixed(1)}% success rate`
