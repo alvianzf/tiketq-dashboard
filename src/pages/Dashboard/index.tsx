@@ -1,4 +1,6 @@
 import { Card, CardBody, Spinner, Button } from "@nextui-org/react";
+import { useState, useEffect } from "react";
+import io from "socket.io-client";
 import { 
   TrendingUp, 
   Users, 
@@ -33,11 +35,27 @@ const DashboardPage = () => {
     );
   }
 
+  const [onlineVisitors, setOnlineVisitors] = useState<number>(0);
+
+  useEffect(() => {
+    // Assuming backend is at VITE_API_URL or defaults to localhost:3001
+    const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001');
+
+    socket.on('visitors_update', (data: { activeVisitors: number }) => {
+      setOnlineVisitors(data.activeVisitors);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, []);
+
   const successRate = statsData && statsData.totalTransactions > 0
     ? `${((statsData.successfulTransactions / statsData.totalTransactions) * 100).toFixed(1)}% success rate`
     : "—";
 
   const stats = [
+    { title: "Online Visitors", value: onlineVisitors.toString(), change: "real-time", trend: "up", icon: Users, color: "text-purple-500" },
     { title: "Total Revenue", value: `Rp ${Number(statsData?.totalRevenue || 0).toLocaleString('id-ID')}`, change: statsData?.growth || "—", trend: "up", icon: CreditCard, color: "text-blue-500" },
     { title: "Successful Txns", value: statsData?.successfulTransactions?.toString() || '0', change: successRate, trend: "up", icon: Users, color: "text-[#00D5FF]" },
     { title: "Total Bookings", value: statsData?.totalTransactions?.toString() || '0', change: "all time", trend: "up", icon: TrendingUp, color: "text-green-500" },
@@ -56,7 +74,7 @@ const DashboardPage = () => {
       {/* System Health Section */}
       <SystemHealth />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
         {stats.map((stat, i) => (
           <Card key={i} className="bg-white/5 border-white/10 backdrop-blur-2xl shadow-2xl hover:translate-y-[-4px] transition-all duration-300 group overflow-hidden relative">
             <div className="absolute top-0 right-0 w-24 h-24 bg-white/5 blur-3xl rounded-full -mr-12 -mt-12 group-hover:bg-blue-500/10 transition-colors" />
