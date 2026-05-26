@@ -30,7 +30,29 @@ const DashboardPage = () => {
 
   useEffect(() => {
     // Assuming backend is at VITE_API_URL or defaults to localhost:3001
-    const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3001');
+    let apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+
+    // Dynamically fallback to production API if we are running in the browser on production domains
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      const isLocal = hostname === 'localhost' || hostname === '127.0.0.1' || hostname.startsWith('192.168.') || hostname.startsWith('10.');
+      
+      // If the bundled API URL points to localhost but the browser is on a production domain, auto-correct to the production API origin
+      if (!isLocal && (apiUrl.includes('localhost') || apiUrl.includes('127.0.0.1'))) {
+        apiUrl = 'https://api.tiketq.com';
+      }
+    }
+
+    let socketUrl = 'http://localhost:3001';
+    try {
+      // Securely extract only the protocol + host origin (stripping sub-paths like /api)
+      const urlObj = new URL(apiUrl);
+      socketUrl = urlObj.origin;
+    } catch (e) {
+      socketUrl = apiUrl;
+    }
+
+    const socket = io(socketUrl);
 
     socket.on('visitors_update', (data: { activeVisitors: number }) => {
       setOnlineVisitors(data.activeVisitors);
