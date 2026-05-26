@@ -7,7 +7,8 @@ import {
   LogOut,
   TrendingUp,
   Users,
-  Terminal
+  Terminal,
+  FileText
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useAuth } from "../../context/AuthContext";
@@ -24,6 +25,7 @@ const Sidebar = () => {
     { name: "Analytics", path: "/analytics", icon: TrendingUp },
     { name: "User Management", path: "/users", icon: Users },
     { name: "Server Manager", path: "/server", icon: Terminal },
+    { name: "System Logs", path: "/logs", icon: FileText },
   ];
 
   const handleLogout = () => {

@@ -62,6 +62,10 @@ export const adminService = {
     const { data } = await api.get<AppResponse<Schedule[]>>("/admin/upcoming-schedules");
     return data.data;
   },
+  getLogs: async (): Promise<string> => {
+    const { data } = await api.get<AppResponse<string>>("/admin/logs");
+    return data.data;
+  },
   
   // User Management
   getUsers: async (): Promise<AuthUser[]> => {
