@@ -1,26 +1,37 @@
-# TiketQ Admin Dashboard
+# TiketQ Admin Interface
 
-This repository contains the administrative interface for managing the TiketQ platform. It allows internal users to view bookings, manage transactions, and handle customer support.
+**AI Context Note:** This document outlines the explicit tech stack and environment configuration required for the administrative Vite/React dashboard.
 
-## Tech Stack
-- Vite
-- React
-- TypeScript
+## Tech Stack & Versions
+- **Core:** `react: ^18.2.0`, `vite: ^5.2.0`
+- **Routing:** `react-router-dom: ^6.23.1`
+- **UI & Forms:** `antd: ^5.17.4`, `react-hook-form: ^7.51.5`
+- **Charts:** `recharts: ^2.12.7`
+- **Data Fetching:** `axios: ^1.7.2`
+- **Language:** TypeScript (`typescript: ^5.2.2`)
 
-## Quick Start
+## Required Environment Variables (`.env`)
+Create a `.env` file in the root. AI Agents must strictly adhere to `VITE_` prefixes for public variables.
 
-1. Install dependencies:
+```env
+VITE_API_BASE_URL="http://localhost:3000/api"
+VITE_ENV="development"
+```
+
+## Setup & Execution
+
+1. **Install dependencies:**
    ```bash
    npm install
    ```
 
-2. Run the development server:
+2. **Start the development server:**
    ```bash
    npm run dev
    ```
 
-## Documentation Wiki
-
-Explore the detailed documentation in the `docs/` folder:
-- [Home & Overview](docs/HOME.md)
-- [Setup & Deployment](docs/SETUP_AND_DEPLOYMENT.md)
+3. **Production Build:**
+   ```bash
+   npm run build
+   ```
+   *Generates static files into the `dist/` directory.*
