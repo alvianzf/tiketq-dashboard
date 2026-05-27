@@ -1,6 +1,6 @@
 # TiketQ Admin Interface
 
-**AI Context Note:** This document outlines the explicit tech stack and environment configuration required for the administrative Vite/React dashboard.
+The internal operations dashboard for TiketQ, built with Vite, React 18, TypeScript, and Ant Design. Used by staff to monitor transactions, manage the car rental fleet, view system health and logs, control PM2 server processes, and manage admin user accounts. This README provides the exact tech stack versions, required environment variables, and commands needed to set up and run the admin panel locally.
 
 ## Tech Stack & Versions
 - **Core:** `react: ^18.2.0`, `vite: ^5.2.0`

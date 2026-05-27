@@ -1,6 +1,6 @@
 # Admin Architecture & Full Service Blueprint
 
-**AI Context Note:** This document is derived from reading `src/services/api.ts` directly. It contains the exact API service methods, Axios interceptor logic, and architectural rules.
+This document describes the complete architecture of the `tiket-admin` Vite + React dashboard used by TiketQ operators. It provides the full `adminService` API method map — every single function call, its HTTP method, its endpoint path, and its TypeScript return type — derived directly from `src/services/api.ts`. It also documents the Axios JWT interceptor logic (how the Bearer token is injected from localStorage and how 401 errors are handled), the authentication flow, the page routing structure, and the strict rule that this repository uses Ant Design exclusively (not NextUI or Tailwind component utilities). Use this document as the definitive reference before adding new pages, API calls, or UI components to the admin panel.
 
 ---
 
