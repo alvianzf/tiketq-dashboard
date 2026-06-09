@@ -1,19 +1,25 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { 
-  LayoutDashboard, 
-  Receipt, 
-  Car, 
-  Settings, 
+import {
+  LayoutDashboard,
+  Receipt,
+  Car,
+  Settings,
   LogOut,
   TrendingUp,
   Users,
   Terminal,
-  FileText
+  FileText,
+  X
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useAuth } from "../../context/AuthContext";
 
-const Sidebar = () => {
+interface Props {
+  isOpen: boolean;
+  onClose: () => void;
+}
+
+const Sidebar = ({ isOpen, onClose }: Props) => {
   const { pathname } = useLocation();
   const { logout, user } = useAuth();
   const navigate = useNavigate();
@@ -33,13 +39,23 @@ const Sidebar = () => {
     navigate("/login");
   };
 
+  const handleNavigate = () => {
+    onClose();
+  };
+
   return (
-    <aside className="w-72 bg-zinc-950/40 border-r border-white/5 backdrop-blur-2xl flex flex-col p-6 h-screen">
+    <aside className={cn(
+      "fixed lg:relative inset-y-0 left-0 z-30",
+      "w-72 bg-zinc-950/95 lg:bg-zinc-950/40 border-r border-white/5 backdrop-blur-2xl flex flex-col p-6 h-screen",
+      "transition-transform duration-300 ease-in-out",
+      "lg:translate-x-0",
+      isOpen ? "translate-x-0" : "-translate-x-full"
+    )}>
       <div className="flex items-center gap-3 px-2 mb-10">
-        <div className="w-10 h-10 bg-gradient-to-tr from-[#4267B2] to-[#00D5FF] rounded-xl flex items-center justify-center font-bold text-xl shadow-lg shadow-blue-500/20">
+        <div className="w-10 h-10 bg-gradient-to-tr from-[#4267B2] to-[#00D5FF] rounded-xl flex items-center justify-center font-bold text-xl shadow-lg shadow-blue-500/20 shrink-0">
           TQ
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col flex-1">
           <span className="text-xl font-bold text-white tracking-tight">
             TiketQ Hub
           </span>
@@ -47,6 +63,13 @@ const Sidebar = () => {
             Admin Panel
           </span>
         </div>
+        <button
+          onClick={onClose}
+          className="lg:hidden p-1.5 rounded-lg text-zinc-500 hover:text-white hover:bg-white/5 transition-colors"
+          aria-label="Close menu"
+        >
+          <X size={18} />
+        </button>
       </div>
 
       <nav className="flex-1 space-y-1.5">
@@ -56,6 +79,7 @@ const Sidebar = () => {
             <Link
               key={item.path}
               to={item.path}
+              onClick={handleNavigate}
               className={cn(
                 "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden",
                 isActive 

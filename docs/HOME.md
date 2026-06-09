@@ -156,3 +156,18 @@ type Schedule = {
 | `Analytics` | `/analytics` | Protected. Charts using `recharts`. |
 | `Logs` | `/logs` | Protected. Displays raw log string from API. |
 | `ServerManager` | `/server` | Protected. PM2 process control + file system browser. |
+
+---
+
+## Responsive Sidebar Layout
+
+The sidebar is a **slide-in drawer on mobile** and a **permanent fixture on desktop** (`≥ lg / 1024px`).
+
+**Pattern (`RootLayout.tsx` + `Sidebar.tsx`):**
+- `RootLayout` holds `sidebarOpen: boolean` state and passes `isOpen` + `onClose` props to `<Sidebar>`.
+- A hamburger `<button>` (using `<Menu>` from `lucide-react`) appears in `<main>` only on mobile (`lg:hidden`) and sets `sidebarOpen = true`.
+- A semi-transparent backdrop (`fixed inset-0 bg-black/50 z-20 lg:hidden`) renders when open; clicking it calls `onClose`.
+- `Sidebar` uses `fixed lg:relative inset-y-0 left-0 z-30` + `transition-transform` + `lg:translate-x-0` / `-translate-x-full` for the slide animation via Tailwind.
+- Each nav `<Link>` calls `onClose()` so the drawer closes after navigation on mobile.
+
+**Do not** add a separate mobile nav or top bar — the hamburger-in-main-content pattern is the established approach here.
