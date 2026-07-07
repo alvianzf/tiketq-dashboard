@@ -1,12 +1,12 @@
 # Admin Architecture & Full Service Blueprint
 
-This document describes the complete architecture of the `tiket-admin` Vite + React dashboard used by TiketQ operators. It provides the full `adminService` API method map — every single function call, its HTTP method, its endpoint path, and its TypeScript return type — derived directly from `src/services/api.ts`. It also documents the Axios JWT interceptor logic (how the Bearer token is injected from localStorage and how 401 errors are handled), the authentication flow, the page routing structure, and the strict rule that this repository uses Ant Design exclusively (not NextUI or Tailwind component utilities). Use this document as the definitive reference before adding new pages, API calls, or UI components to the admin panel.
+This document describes the complete architecture of the `tiket-admin` Vite + React dashboard used by TiketQ operators. It provides the full `adminService` API method map — every single function call, its HTTP method, its endpoint path, and its TypeScript return type — derived directly from `src/services/api.ts`. It also documents the Axios JWT interceptor logic (how the Bearer token is injected from localStorage and how 401 errors are handled), the authentication flow, and the page routing structure. Use this document as the definitive reference before adding new pages, API calls, or UI components to the admin panel.
 
 ---
 
 ## Tech Stack & Rules
 - **Framework:** Vite + React 18 + TypeScript
-- **UI:** Ant Design (`antd`) — **DO NOT use NextUI or TailwindCSS component utilities here**
+- **UI:** In practice this is **NextUI + Tailwind** (see `src/pages/Transactions/index.tsx`, `src/utils/swal.ts` for SweetAlert confirm dialogs) — despite an earlier project convention documenting Ant Design as the exclusive UI library. Match whatever the page you're editing already uses; don't mix libraries within one page.
 - **API layer:** A single Axios instance (`api`) in `src/services/api.ts`
 - **State:** React Query (same version as `tiket-FE`)
 
@@ -60,6 +60,8 @@ All methods return typed data extracted from `AppResponse<T>` wrapper (`{ messag
 ```typescript
 // --- Dashboard ---
 adminService.getTransactions()        // GET /admin/transactions → Transaction[]
+adminService.cancelTransaction(id)    // PATCH /admin/transactions/:id/cancel → Transaction
+adminService.refundTransaction(id)    // PATCH /admin/transactions/:id/refund → Transaction
 adminService.getStats()               // GET /admin/stats → Stats
 adminService.getHealth()              // GET /admin/health → Health
 adminService.getUpcomingSchedules()   // GET /admin/upcoming-schedules → Schedule[]
@@ -111,10 +113,13 @@ type Transaction = {
   totalSales: string;
   email: string;
   createdAt: string;
-  flightBooking: { ... } | null;
-  ferryBooking: { ... } | null;
-  carRentalRequest: { ... } | null;
+  flightBooking: { ...; ticketIssued?: boolean } | null;
+  ferryBooking: { ...; ticketIssued?: boolean } | null;
+  carRentalRequest: { ... } | null; // no ticketIssued — car rentals are always exempt from the cancel/refund block
 }
+// status: "PENDING" (shown as "Booked") | "PAID" | "CANCELLED" | "REFUNDED"
+// Cancel/refund (PATCH .../cancel, .../refund) is blocked with 409 once ticketIssued is true
+// for flight/ferry bookings; car rentals are never blocked.
 
 type Stats = {
   totalTransactions: number;

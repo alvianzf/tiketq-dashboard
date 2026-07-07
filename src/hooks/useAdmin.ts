@@ -9,21 +9,23 @@ export interface Transaction {
   totalSales: number;
   status: string;
   createdAt: string;
-  flightBooking?: { 
+  flightBooking?: {
     id: number;
-    name?: string; 
+    name?: string;
     origin?: string;
     destination?: string;
     departureDate?: string;
     passengers?: any[];
+    ticketIssued?: boolean;
   };
-  ferryBooking?: { 
+  ferryBooking?: {
     id: number;
-    mobile_number?: string; 
+    mobile_number?: string;
     origin?: { name: string };
     destination?: { name: string };
     departureDate?: string;
     passengers?: any[];
+    ticketIssued?: boolean;
   };
   carRentalRequest?: { 
     id: number;
@@ -78,6 +80,22 @@ export const useTransactions = () => {
     queryKey: ["transactions"],
     queryFn: adminService.getTransactions,
   });
+};
+
+export const useTransactionMutation = () => {
+  const queryClient = useQueryClient();
+
+  const cancelTransaction = useMutation({
+    mutationFn: (id: number) => adminService.cancelTransaction(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["transactions"] }),
+  });
+
+  const refundTransaction = useMutation({
+    mutationFn: (id: number) => adminService.refundTransaction(id),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ["transactions"] }),
+  });
+
+  return { cancelTransaction, refundTransaction };
 };
 
 export const useStats = () => {

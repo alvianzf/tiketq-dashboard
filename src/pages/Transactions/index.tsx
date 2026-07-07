@@ -19,11 +19,16 @@ import {
   ModalHeader,
   ModalBody,
   ModalFooter,
+  Dropdown,
+  DropdownTrigger,
+  DropdownMenu,
+  DropdownItem,
 } from "@nextui-org/react";
-import { Search, Filter, Download, MoreVertical, Eye, MapPin, Calendar, Users, CreditCard, Hash } from "lucide-react";
+import { Search, Filter, Download, MoreVertical, Eye, MapPin, Calendar, Users, CreditCard, Hash, Ban, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
-import { useTransactions, type Transaction } from "../../hooks/useAdmin";
+import { useTransactions, useTransactionMutation, type Transaction } from "../../hooks/useAdmin";
 import { useState } from "react";
+import { confirmAction } from "../../utils/swal";
 
 const statusColorMap: Record<string, "success" | "warning" | "danger" | "default" | "primary" | "secondary"> = {
   success: "success",
@@ -31,16 +36,56 @@ const statusColorMap: Record<string, "success" | "warning" | "danger" | "default
   failed: "danger",
   "PAID": "success",
   "PENDING": "warning",
+  "CANCELLED": "danger",
+  "REFUNDED": "secondary",
 };
+
+const statusLabel = (status: string) => (status === "PENDING" ? "Booked" : status);
+
+// Ticket already issued blocks cancel/refund for flight/ferry; car rentals are always exempt.
+const isTicketIssued = (transaction: Transaction) =>
+  transaction.serviceType !== "CAR_RENTAL" &&
+  (transaction.flightBooking?.ticketIssued || transaction.ferryBooking?.ticketIssued);
 
 const TransactionsPage = () => {
   const { data: transactions, isLoading } = useTransactions();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const { cancelTransaction, refundTransaction } = useTransactionMutation();
 
   const handleQuickView = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
     onOpen();
+  };
+
+  const handleCancel = async (transaction: Transaction) => {
+    const result = await confirmAction(
+      "Cancel this booking?",
+      `This will cancel transaction ${transaction.bookingCode || `#${transaction.id}`}.`,
+      "Yes, cancel it",
+    );
+    if (!result.isConfirmed) return;
+    try {
+      await cancelTransaction.mutateAsync(transaction.id);
+      toast.success("Transaction cancelled");
+    } catch {
+      // error toast already shown by the axios interceptor
+    }
+  };
+
+  const handleRefund = async (transaction: Transaction) => {
+    const result = await confirmAction(
+      "Refund this booking?",
+      `This will mark transaction ${transaction.bookingCode || `#${transaction.id}`} as refunded.`,
+      "Yes, refund it",
+    );
+    if (!result.isConfirmed) return;
+    try {
+      await refundTransaction.mutateAsync(transaction.id);
+      toast.success("Transaction refunded");
+    } catch {
+      // error toast already shown by the axios interceptor
+    }
   };
 
   const handleExport = () => {
@@ -142,30 +187,58 @@ const TransactionsPage = () => {
                   </TableCell>
                   <TableCell className="font-bold text-white">Rp {Number(transaction.totalSales).toLocaleString('id-ID')}</TableCell>
                   <TableCell>
-                    <Chip 
-                      className="capitalize border-none px-3 h-7 font-bold text-[10px]" 
-                      color={statusColorMap[transaction.status] || "default"} 
-                      size="sm" 
+                    <Chip
+                      className="capitalize border-none px-3 h-7 font-bold text-[10px]"
+                      color={statusColorMap[transaction.status] || "default"}
+                      size="sm"
                       variant="flat"
                     >
-                      {transaction.status}
+                      {statusLabel(transaction.status)}
                     </Chip>
                   </TableCell>
                   <TableCell>
                     <div className="relative flex items-center justify-center gap-3">
                       <Tooltip content="Quick View" showArrow>
-                        <button 
+                        <button
                           onClick={() => handleQuickView(transaction)}
                           className="p-2 rounded-lg bg-white/5 hover:bg-blue-500/10 text-zinc-400 hover:text-blue-500 transition-all border border-white/5"
                         >
                           <Eye size={16} />
                         </button>
                       </Tooltip>
-                      <Tooltip content="Manage" showArrow>
-                        <button className="p-2 rounded-lg bg-white/5 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all border border-white/5">
-                          <MoreVertical size={16} />
-                        </button>
-                      </Tooltip>
+                      <Dropdown>
+                        <DropdownTrigger>
+                          <button className="p-2 rounded-lg bg-white/5 hover:bg-zinc-800 text-zinc-400 hover:text-white transition-all border border-white/5">
+                            <MoreVertical size={16} />
+                          </button>
+                        </DropdownTrigger>
+                        <DropdownMenu
+                          aria-label="Manage transaction"
+                          disabledKeys={
+                            isTicketIssued(transaction) || ["CANCELLED", "REFUNDED"].includes(transaction.status)
+                              ? ["cancel", "refund"]
+                              : []
+                          }
+                        >
+                          <DropdownItem
+                            key="cancel"
+                            startContent={<Ban size={16} />}
+                            description={isTicketIssued(transaction) ? "Ticket already issued" : undefined}
+                            onPress={() => handleCancel(transaction)}
+                          >
+                            Cancel booking
+                          </DropdownItem>
+                          <DropdownItem
+                            key="refund"
+                            startContent={<RotateCcw size={16} />}
+                            description={isTicketIssued(transaction) ? "Ticket already issued" : undefined}
+                            onPress={() => handleRefund(transaction)}
+                            color="danger"
+                          >
+                            Refund booking
+                          </DropdownItem>
+                        </DropdownMenu>
+                      </Dropdown>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -326,8 +399,8 @@ const QuickViewModal = ({
           <div className="grid grid-cols-2 gap-6 mb-6">
             <div className="space-y-1">
               <p className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Status</p>
-              <Chip size="sm" variant="flat" color={transaction.status === "PAID" ? "success" : "warning"}>
-                {transaction.status}
+              <Chip size="sm" variant="flat" color={statusColorMap[transaction.status] || "default"}>
+                {statusLabel(transaction.status)}
               </Chip>
             </div>
             <div className="space-y-1">

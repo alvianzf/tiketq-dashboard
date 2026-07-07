@@ -50,6 +50,14 @@ export const adminService = {
     const { data } = await api.get<AppResponse<Transaction[]>>("/admin/transactions");
     return data.data;
   },
+  cancelTransaction: async (id: number): Promise<Transaction> => {
+    const { data } = await api.patch<AppResponse<Transaction>>(`/admin/transactions/${id}/cancel`);
+    return data.data;
+  },
+  refundTransaction: async (id: number): Promise<Transaction> => {
+    const { data } = await api.patch<AppResponse<Transaction>>(`/admin/transactions/${id}/refund`);
+    return data.data;
+  },
   getStats: async (): Promise<Stats> => {
     const { data } = await api.get<AppResponse<Stats>>("/admin/stats");
     return data.data;
