@@ -24,10 +24,10 @@ import {
   DropdownMenu,
   DropdownItem,
 } from "@nextui-org/react";
-import { Search, Filter, Download, MoreVertical, Eye, MapPin, Calendar, Users, CreditCard, Hash, Ban, RotateCcw } from "lucide-react";
+import { Search, Download, MoreVertical, Eye, MapPin, Calendar, Users, CreditCard, Hash, Ban, RotateCcw } from "lucide-react";
 import { toast } from "sonner";
 import { useTransactions, useTransactionMutation, type Transaction } from "../../hooks/useAdmin";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { confirmAction } from "../../utils/swal";
 
 const statusColorMap: Record<string, "success" | "warning" | "danger" | "default" | "primary" | "secondary"> = {
@@ -42,6 +42,13 @@ const statusColorMap: Record<string, "success" | "warning" | "danger" | "default
 
 const statusLabel = (status: string) => (status === "PENDING" ? "Booked" : status);
 
+const getCustomerName = (transaction: Transaction) => {
+  if (transaction.flightBooking) return transaction.flightBooking.name || transaction.email;
+  if (transaction.ferryBooking) return transaction.ferryBooking.mobile_number || transaction.email;
+  if (transaction.carRentalRequest) return transaction.carRentalRequest.fullName || transaction.email;
+  return transaction.email || "Guest";
+};
+
 // Ticket already issued blocks cancel/refund for flight/ferry; car rentals are always exempt.
 const isTicketIssued = (transaction: Transaction) =>
   transaction.serviceType !== "CAR_RENTAL" &&
@@ -51,7 +58,24 @@ const TransactionsPage = () => {
   const { data: transactions, isLoading } = useTransactions();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
   const [selectedTransaction, setSelectedTransaction] = useState<Transaction | null>(null);
+  const [search, setSearch] = useState("");
   const { cancelTransaction, refundTransaction } = useTransactionMutation();
+
+  const filteredTransactions = useMemo(() => {
+    if (!transactions) return [];
+    const query = search.trim().toLowerCase();
+    if (!query) return transactions;
+    return transactions.filter((transaction) =>
+      [
+        getCustomerName(transaction),
+        transaction.email,
+        transaction.bookingCode,
+        `#${transaction.id}`,
+      ]
+        .filter(Boolean)
+        .some((field) => String(field).toLowerCase().includes(query)),
+    );
+  }, [transactions, search]);
 
   const handleQuickView = (transaction: Transaction) => {
     setSelectedTransaction(transaction);
@@ -89,19 +113,37 @@ const TransactionsPage = () => {
   };
 
   const handleExport = () => {
-    toast.promise(new Promise((resolve) => setTimeout(resolve, 2000)), {
-      loading: 'Preparing transactions report...',
-      success: 'Export successful! transactions_report.csv has been downloaded.',
-      error: 'Failed to export transactions.',
-    });
+    if (filteredTransactions.length === 0) {
+      toast.error("No transactions to export.");
+      return;
+    }
+    const headers = ["Customer", "Email", "Type", "Date", "Amount", "Status"];
+    const escapeCsv = (value: string) => `"${value.replace(/"/g, '""')}"`;
+    const rows = filteredTransactions.map((transaction) =>
+      [
+        getCustomerName(transaction),
+        transaction.email || "",
+        transaction.serviceType.replace('_', ' '),
+        new Date(transaction.createdAt).toLocaleDateString('id-ID'),
+        `Rp ${Number(transaction.totalSales).toLocaleString('id-ID')}`,
+        statusLabel(transaction.status),
+      ]
+        .map((field) => escapeCsv(String(field)))
+        .join(","),
+    );
+    const csv = [headers.map(escapeCsv).join(","), ...rows].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "transactions_report.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+    toast.success("Export successful! transactions_report.csv has been downloaded.");
   };
 
-  const getCustomerName = (transaction: Transaction) => {
-    if (transaction.flightBooking) return transaction.flightBooking.name || transaction.email;
-    if (transaction.ferryBooking) return transaction.ferryBooking.mobile_number || transaction.email;
-    if (transaction.carRentalRequest) return transaction.carRentalRequest.fullName || transaction.email;
-    return transaction.email || "Guest";
-  };
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
       <div className="flex items-center justify-between">
@@ -120,16 +162,19 @@ const TransactionsPage = () => {
 
       <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-2xl shadow-xl">
         <Input
-          placeholder="Search transactions..."
+          placeholder="Search by customer, email or booking code..."
           startContent={<Search className="text-zinc-500" size={18} />}
           className="max-w-md"
           variant="bordered"
+          value={search}
+          onValueChange={setSearch}
+          isClearable
+          onClear={() => setSearch("")}
           classNames={{
             input: "text-white",
             inputWrapper: "border-white/5 hover:border-white/10 focus-within:!border-blue-500/50 bg-white/5",
           }}
         />
-        <Button variant="flat" className="bg-white/5 border border-white/10 text-zinc-300" startContent={<Filter size={18} />}>Filter</Button>
       </div>
 
       <Card className="bg-white/5 border-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden">
@@ -154,7 +199,7 @@ const TransactionsPage = () => {
             </TableHeader>
             <TableBody 
               emptyContent={isLoading ? <Spinner color="primary" /> : "No transactions found"}
-              items={transactions || []}
+              items={filteredTransactions}
             >
               {(transaction: Transaction) => (
                 <TableRow key={transaction.id} className="hover:bg-white/5 transition-colors group">
@@ -423,9 +468,6 @@ const QuickViewModal = ({
         <ModalFooter>
           <Button variant="flat" className="bg-white/5 text-zinc-300 border border-white/10" onPress={onOpenChange}>
             Close
-          </Button>
-          <Button className="bg-blue-600 text-white font-bold shadow-lg shadow-blue-600/20">
-            Send Receipt
           </Button>
         </ModalFooter>
       </ModalContent>
