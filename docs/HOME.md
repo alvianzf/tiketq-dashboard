@@ -5,8 +5,8 @@ This document describes the complete architecture of the `tiket-admin` Vite + Re
 ---
 
 ## Tech Stack & Rules
-- **Framework:** Vite + React 18 + TypeScript
-- **UI:** In practice this is **NextUI + Tailwind** (see `src/pages/Transactions/index.tsx`, `src/utils/swal.ts` for SweetAlert confirm dialogs) — despite an earlier project convention documenting Ant Design as the exclusive UI library. Match whatever the page you're editing already uses; don't mix libraries within one page.
+- **Framework:** Vite + React 19 + TypeScript
+- **UI:** **NextUI v2 (`@nextui-org/react`) + Tailwind v4** (see `src/pages/Transactions/index.tsx`, `src/utils/swal.ts` for SweetAlert confirm dialogs). There is **no `antd` / Ant Design dependency** — any older note calling Ant Design the admin UI library is out of date. Match whatever the page you're editing already uses; don't mix libraries within one page.
 - **API layer:** A single Axios instance (`api`) in `src/services/api.ts`
 - **State:** React Query (same version as `tiket-FE`)
 
@@ -106,16 +106,15 @@ These are imported by `api.ts` and used as return types:
 ```typescript
 type Transaction = {
   id: number;
-  serviceType: 'FLIGHT' | 'FERRY' | 'CAR_RENTAL';
-  bookingCode: string;
-  payment_status: boolean;
-  status: string;
-  totalSales: string;
+  serviceType: string;        // in practice 'FLIGHT' | 'FERRY' | 'CAR_RENTAL'
+  bookingCode?: string;
   email: string;
+  totalSales: number;
+  status: string;
   createdAt: string;
-  flightBooking: { ...; ticketIssued?: boolean } | null;
-  ferryBooking: { ...; ticketIssued?: boolean } | null;
-  carRentalRequest: { ... } | null; // no ticketIssued — car rentals are always exempt from the cancel/refund block
+  flightBooking?: { ...; ticketIssued?: boolean };
+  ferryBooking?: { ...; ticketIssued?: boolean };
+  carRentalRequest?: { ... };  // no ticketIssued — car rentals are always exempt from the cancel/refund block
 }
 // status: "PENDING" (shown as "Booked") | "PAID" | "CANCELLED" | "REFUNDED"
 // Cancel/refund (PATCH .../cancel, .../refund) is blocked with 409 once ticketIssued is true
@@ -132,9 +131,9 @@ type Stats = {
 }
 
 type Health = {
-  status: 'Online' | 'Degraded';
+  status: string;             // e.g. 'Online' | 'Degraded'
   services: { name: string; status: string; latency: string }[];
-  system: { cpu: string; memory: string; uptime: string; memPercent: number; cpuPercent: number; }
+  system: { cpu: string; memory: string; uptime: string; cpuPercent?: number; memPercent?: number; }
 }
 
 type Schedule = {
@@ -155,7 +154,7 @@ type Schedule = {
 |------|-------|-------------|
 | `Login` | `/login` | Unprotected. Calls `POST /api/auth/admin-login`. |
 | `Dashboard` | `/` | Protected. Displays `Stats`, `Health`, `Schedule`. |
-| `Transactions` | `/transactions` | Protected. Renders `antd` Table of all transactions. |
+| `Transactions` | `/transactions` | Protected. NextUI `Table` of all transactions with live client-side search (customer name, email, booking code, `#id`), a real CSV download ("Export CSV", generated client-side via a `Blob`), and a per-row Quick View modal + Cancel/Refund dropdown. |
 | `Users` | `/users` | Protected + admin only. User CRUD. |
 | `CarRental` | `/car-rental` | Protected. Car fleet management with photo uploads. |
 | `Analytics` | `/analytics` | Protected. Charts using `recharts`. |
