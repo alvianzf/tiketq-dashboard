@@ -38,9 +38,18 @@ const statusColorMap: Record<string, "success" | "warning" | "danger" | "default
   "PENDING": "warning",
   "CANCELLED": "danger",
   "REFUNDED": "secondary",
+  "ISSUED": "success",
+  "ISSUING": "warning",
 };
 
-const statusLabel = (status: string) => (status === "PENDING" ? "Booked" : status);
+// PAID surfaces as the ticket state: ISSUED once the ticket exists, ISSUING
+// during the provider's async issuance window (flight rc 32 / ONPROGRESS).
+const displayStatus = (transaction: Transaction) => {
+  if (transaction.status === "PENDING") return "Booked";
+  if (transaction.status !== "PAID") return transaction.status;
+  if (transaction.serviceType === "CAR_RENTAL") return "PAID";
+  return isTicketIssued(transaction) ? "ISSUED" : "ISSUING";
+};
 
 const getCustomerName = (transaction: Transaction) => {
   if (transaction.flightBooking) return transaction.flightBooking.name || transaction.email;
@@ -126,7 +135,7 @@ const TransactionsPage = () => {
         transaction.serviceType.replace('_', ' '),
         new Date(transaction.createdAt).toLocaleDateString('id-ID'),
         `Rp ${Number(transaction.totalSales).toLocaleString('id-ID')}`,
-        statusLabel(transaction.status),
+        displayStatus(transaction),
       ]
         .map((field) => escapeCsv(String(field)))
         .join(","),
@@ -234,11 +243,11 @@ const TransactionsPage = () => {
                   <TableCell>
                     <Chip
                       className="capitalize border-none px-3 h-7 font-bold text-[10px]"
-                      color={statusColorMap[transaction.status] || "default"}
+                      color={statusColorMap[displayStatus(transaction)] || "default"}
                       size="sm"
                       variant="flat"
                     >
-                      {statusLabel(transaction.status)}
+                      {displayStatus(transaction)}
                     </Chip>
                   </TableCell>
                   <TableCell>
@@ -444,8 +453,8 @@ const QuickViewModal = ({
           <div className="grid grid-cols-2 gap-6 mb-6">
             <div className="space-y-1">
               <p className="text-[10px] uppercase tracking-wider text-zinc-500 font-bold">Status</p>
-              <Chip size="sm" variant="flat" color={statusColorMap[transaction.status] || "default"}>
-                {statusLabel(transaction.status)}
+              <Chip size="sm" variant="flat" color={statusColorMap[displayStatus(transaction)] || "default"}>
+                {displayStatus(transaction)}
               </Chip>
             </div>
             <div className="space-y-1">
