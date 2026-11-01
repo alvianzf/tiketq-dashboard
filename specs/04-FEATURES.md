@@ -130,3 +130,4 @@ File: `src/pages/Login/index.tsx`. See `05-AUTH-AND-SECURITY.md` for the flow.
 - **Destructive confirmations** — `confirmDelete` / `confirmAction` (SweetAlert2) in `src/utils/swal.ts`. Note the Server Manager also uses native `confirm`/`prompt` in places.
 - **Loading** — NextUI `<Spinner/>` and skeleton cards.
 - **Formatting** — currency rendered as `Rp {Number(x).toLocaleString('id-ID')}` throughout.
+- **Forms submit on Enter** — every form (Login, the Car add/edit modal, and any future form) must submit on Enter: wrap fields in `<form onSubmit={...}>` with a `type="submit"` primary action, rather than submitting only from a button `onClick`.
