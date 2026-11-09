@@ -84,6 +84,24 @@ adminService.uploadPhotos(carId, photos: File[])  // POST /car-rental/cars/:id/p
 adminService.deletePhoto(photoId)                 // DELETE /car-rental/photos/:photoId
 adminService.deletePhotosBulk(photoIds: number[]) // POST /car-rental/photos/bulk-delete { ids: number[] }
 
+// --- ItinerQ Destination Catalog ---
+adminService.getDestinations()                    // GET /destinations → Destination[]
+adminService.createDestination(destData)          // POST /destinations → Destination
+adminService.updateDestination(id, destData)      // PUT /destinations/:id → Destination
+adminService.deleteDestination(id)                // DELETE /destinations/:id → void
+
+// --- Hotel Catalog ---
+adminService.getHotels()                          // GET /hotels → Hotel[]
+adminService.createHotel(hotelData)                // POST /hotels → Hotel
+adminService.updateHotel(id, hotelData)            // PUT /hotels/:id → Hotel
+adminService.deleteHotel(id)                       // DELETE /hotels/:id → void
+
+// --- Activities Catalog ---
+adminService.getActivities()                       // GET /activities → Activity[]
+adminService.createActivity(activityData)          // POST /activities → Activity
+adminService.updateActivity(id, activityData)      // PUT /activities/:id → Activity
+adminService.deleteActivity(id)                    // DELETE /activities/:id → void
+
 // --- Server Management (PM2 + File System) ---
 adminService.getServerFiles(path?)               // GET /admin/server/files?path=
 adminService.getFileContent(path)               // GET /admin/server/file?path=
@@ -106,7 +124,7 @@ These are imported by `api.ts` and used as return types:
 ```typescript
 type Transaction = {
   id: number;
-  serviceType: string;        // in practice 'FLIGHT' | 'FERRY' | 'CAR_RENTAL'
+  serviceType: string;        // in practice 'FLIGHT' | 'FERRY' | 'CAR_RENTAL' | 'HOTEL' | 'ACTIVITY' | 'ITINERARY'
   bookingCode?: string;
   email: string;
   totalSales: number;
@@ -144,6 +162,44 @@ type Schedule = {
   customerName: string;
   detail: string;          // e.g. "CGK ➔ DPS" or "3 Hari, SUV"
 }
+
+// Concierge pivot — ItinerQ trip-builder catalog
+type Destination = {
+  id: number;
+  name: string;
+  area: string;
+  category?: string;
+  description?: string;
+  tags: string[];             // interest keywords used by the AI recommend_itinerary tool
+  minStayMinutes: number;
+  travelGapMinutes: number;   // buffer time to reach this destination
+  price: number;
+  photos: string[];           // plain URLs, one per line in the admin form — no file upload
+  available: boolean;
+}
+
+type Hotel = {
+  id: number;
+  name: string;
+  location: string;
+  description?: string;
+  pricePerNight: number;
+  amenities: string[];
+  photos: string[];
+  available: boolean;
+}
+
+type Activity = {
+  id: number;
+  name: string;
+  category: string;
+  location?: string;
+  description?: string;
+  price: number;
+  duration?: string;
+  photos: string[];
+  available: boolean;
+}
 ```
 
 ---
@@ -156,7 +212,10 @@ type Schedule = {
 | `Dashboard` | `/` | Protected. Displays `Stats`, `Health`, `Schedule`. |
 | `Transactions` | `/transactions` | Protected. NextUI `Table` of all transactions with live client-side search (customer name, email, booking code, `#id`), a real CSV download ("Export CSV", generated client-side via a `Blob`), and a per-row Quick View modal + Cancel/Refund dropdown. |
 | `Users` | `/users` | Protected + admin only. User CRUD. |
-| `CarRental` | `/car-rental` | Protected. Car fleet management with photo uploads. |
+| `CarRental` | `/car-rental` | Protected. "Private Driver" fleet management with photo uploads. |
+| `Destinations` | `/destinations` | Protected. ItinerQ trip-builder catalog CRUD (min-stay time, travel-time buffer, interest tags, price). |
+| `Hotels` | `/hotels` | Protected. Hotel catalog CRUD for the concierge booking flow. |
+| `Activities` | `/activities` | Protected. Activities/tours catalog CRUD (golf, diving, island hopping, etc). |
 | `Analytics` | `/analytics` | Protected. Charts using `recharts`. |
 | `Logs` | `/logs` | Protected. Displays raw log string from API. |
 | `ServerManager` | `/server` | Protected. PM2 process control + file system browser. |
