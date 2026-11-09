@@ -3,6 +3,9 @@ import RootLayout from "./components/Layout/RootLayout";
 import DashboardPage from "./pages/Dashboard/index";
 import TransactionsPage from "./pages/Transactions/index";
 import CarRentalPage from "./pages/CarRental/index";
+import DestinationsPage from "./pages/Destinations/index";
+import HotelsPage from "./pages/Hotels/index";
+import ActivitiesPage from "./pages/Activities/index";
 import AnalyticsPage from "./pages/Analytics/index";
 import UsersPage from "./pages/Users/index";
 import ServerManager from "./pages/ServerManager/index";
@@ -21,6 +24,9 @@ function App() {
             <Route index element={<DashboardPage />} />
             <Route path="transactions" element={<TransactionsPage />} />
             <Route path="car-rental" element={<CarRentalPage />} />
+            <Route path="destinations" element={<DestinationsPage />} />
+            <Route path="hotels" element={<HotelsPage />} />
+            <Route path="activities" element={<ActivitiesPage />} />
             <Route path="analytics" element={<AnalyticsPage />} />
             <Route path="users" element={<UsersPage />} />
             <Route path="server" element={<ServerManager />} />

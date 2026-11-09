@@ -9,7 +9,10 @@ import {
   Users,
   Terminal,
   FileText,
-  X
+  X,
+  MapPin,
+  Hotel,
+  Compass
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useAuth } from "../../context/AuthContext";
@@ -27,7 +30,10 @@ const Sidebar = ({ isOpen, onClose }: Props) => {
   const menuItems = [
     { name: "Overview", path: "/", icon: LayoutDashboard },
     { name: "Transactions", path: "/transactions", icon: Receipt },
-    { name: "Car Rental", path: "/car-rental", icon: Car },
+    { name: "Private Driver", path: "/car-rental", icon: Car },
+    { name: "Destinations", path: "/destinations", icon: MapPin },
+    { name: "Hotels", path: "/hotels", icon: Hotel },
+    { name: "Activities", path: "/activities", icon: Compass },
     { name: "Analytics", path: "/analytics", icon: TrendingUp },
     { name: "User Management", path: "/users", icon: Users },
     { name: "Server Manager", path: "/server", icon: Terminal },

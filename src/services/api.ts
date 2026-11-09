@@ -1,6 +1,6 @@
 import axios from "axios";
 import { toast } from "sonner";
-import type { Car, Transaction, Stats, Health, Schedule } from "../hooks/useAdmin";
+import type { Car, Transaction, Stats, Health, Schedule, Destination, Hotel, Activity } from "../hooks/useAdmin";
 import type { User as AuthUser } from "../services/AuthService";
 
 interface AppResponse<T> {
@@ -125,6 +125,57 @@ export const adminService = {
   },
   deletePhotosBulk: async (photoIds: number[]) => {
     const { data } = await api.post("/car-rental/photos/bulk-delete", { ids: photoIds });
+    return data.data;
+  },
+
+  getDestinations: async (): Promise<Destination[]> => {
+    const { data } = await api.get("/destinations");
+    return data.data;
+  },
+  createDestination: async (destData: Partial<Destination>) => {
+    const { data } = await api.post("/destinations", destData);
+    return data.data;
+  },
+  updateDestination: async (id: number, destData: Partial<Destination>) => {
+    const { data } = await api.put(`/destinations/${id}`, destData);
+    return data.data;
+  },
+  deleteDestination: async (id: number) => {
+    const { data } = await api.delete(`/destinations/${id}`);
+    return data.data;
+  },
+
+  getHotels: async (): Promise<Hotel[]> => {
+    const { data } = await api.get("/hotels");
+    return data.data;
+  },
+  createHotel: async (hotelData: Partial<Hotel>) => {
+    const { data } = await api.post("/hotels", hotelData);
+    return data.data;
+  },
+  updateHotel: async (id: number, hotelData: Partial<Hotel>) => {
+    const { data } = await api.put(`/hotels/${id}`, hotelData);
+    return data.data;
+  },
+  deleteHotel: async (id: number) => {
+    const { data } = await api.delete(`/hotels/${id}`);
+    return data.data;
+  },
+
+  getActivities: async (): Promise<Activity[]> => {
+    const { data } = await api.get("/activities");
+    return data.data;
+  },
+  createActivity: async (activityData: Partial<Activity>) => {
+    const { data } = await api.post("/activities", activityData);
+    return data.data;
+  },
+  updateActivity: async (id: number, activityData: Partial<Activity>) => {
+    const { data } = await api.put(`/activities/${id}`, activityData);
+    return data.data;
+  },
+  deleteActivity: async (id: number) => {
+    const { data } = await api.delete(`/activities/${id}`);
     return data.data;
   },
 

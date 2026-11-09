@@ -66,6 +66,43 @@ export interface Car {
   photos?: { id: number; url: string; isPrimary: boolean }[];
 }
 
+export interface Destination {
+  id: number;
+  name: string;
+  area: string;
+  category?: string;
+  description?: string;
+  tags: string[];
+  minStayMinutes: number;
+  travelGapMinutes: number;
+  price: number;
+  photos: string[];
+  available: boolean;
+}
+
+export interface Hotel {
+  id: number;
+  name: string;
+  location: string;
+  description?: string;
+  pricePerNight: number;
+  amenities: string[];
+  photos: string[];
+  available: boolean;
+}
+
+export interface Activity {
+  id: number;
+  name: string;
+  category: string;
+  location?: string;
+  description?: string;
+  price: number;
+  duration?: string;
+  photos: string[];
+  available: boolean;
+}
+
 export interface Schedule {
   id: string;
   type: "FLIGHT" | "FERRY" | "CAR";
@@ -161,4 +198,58 @@ export const useCarMutation = () => {
   });
 
   return { createCar, updateCar, deleteCar, uploadPhotos, deletePhoto, deletePhotosBulk };
+};
+
+export const useDestinations = () => {
+  return useQuery({ queryKey: ["destinations"], queryFn: adminService.getDestinations });
+};
+
+export const useDestinationMutation = () => {
+  const queryClient = useQueryClient();
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["destinations"] });
+
+  const createDestination = useMutation({ mutationFn: adminService.createDestination, onSuccess: invalidate });
+  const updateDestination = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<Destination> }) => adminService.updateDestination(id, data),
+    onSuccess: invalidate,
+  });
+  const deleteDestination = useMutation({ mutationFn: adminService.deleteDestination, onSuccess: invalidate });
+
+  return { createDestination, updateDestination, deleteDestination };
+};
+
+export const useHotels = () => {
+  return useQuery({ queryKey: ["hotels"], queryFn: adminService.getHotels });
+};
+
+export const useHotelMutation = () => {
+  const queryClient = useQueryClient();
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["hotels"] });
+
+  const createHotel = useMutation({ mutationFn: adminService.createHotel, onSuccess: invalidate });
+  const updateHotel = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<Hotel> }) => adminService.updateHotel(id, data),
+    onSuccess: invalidate,
+  });
+  const deleteHotel = useMutation({ mutationFn: adminService.deleteHotel, onSuccess: invalidate });
+
+  return { createHotel, updateHotel, deleteHotel };
+};
+
+export const useActivities = () => {
+  return useQuery({ queryKey: ["activities"], queryFn: adminService.getActivities });
+};
+
+export const useActivityMutation = () => {
+  const queryClient = useQueryClient();
+  const invalidate = () => queryClient.invalidateQueries({ queryKey: ["activities"] });
+
+  const createActivity = useMutation({ mutationFn: adminService.createActivity, onSuccess: invalidate });
+  const updateActivity = useMutation({
+    mutationFn: ({ id, data }: { id: number; data: Partial<Activity> }) => adminService.updateActivity(id, data),
+    onSuccess: invalidate,
+  });
+  const deleteActivity = useMutation({ mutationFn: adminService.deleteActivity, onSuccess: invalidate });
+
+  return { createActivity, updateActivity, deleteActivity };
 };
