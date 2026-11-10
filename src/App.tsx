@@ -10,6 +10,7 @@ import AnalyticsPage from "./pages/Analytics/index";
 import UsersPage from "./pages/Users/index";
 import ServerManager from "./pages/ServerManager/index";
 import LogsPage from "./pages/Logs/index";
+import SettingsPage from "./pages/Settings/index";
 import LoginPage from "./pages/Login/index";
 import ProtectedRoute from "./components/Auth/ProtectedRoute";
 
@@ -31,6 +32,7 @@ function App() {
             <Route path="users" element={<UsersPage />} />
             <Route path="server" element={<ServerManager />} />
             <Route path="logs" element={<LogsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Route>

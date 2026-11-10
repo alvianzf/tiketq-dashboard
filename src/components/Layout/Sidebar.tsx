@@ -136,16 +136,21 @@ const Sidebar = ({ isOpen, onClose, pinned, onTogglePinned }: Props) => {
           </div>
         </div>
 
-        <button
+        <Link
+          to="/settings"
+          onClick={onClose}
           title={expanded ? undefined : "Settings"}
           className={cn(
-            "w-full flex items-center gap-3 px-3 py-2.5 text-muted hover:text-sidebar-foreground hover:bg-surface-hover rounded-xl transition-all text-sm font-medium",
-            !expanded && "lg:justify-center"
+            "flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium",
+            !expanded && "lg:justify-center",
+            pathname === "/settings"
+              ? "bg-brand/10 text-brand"
+              : "text-muted hover:text-sidebar-foreground hover:bg-surface-hover"
           )}
         >
           <Settings size={18} className="shrink-0" />
           <span className={cn(!expanded && "lg:hidden")}>Settings</span>
-        </button>
+        </Link>
         <button
           onClick={handleLogout}
           title={expanded ? undefined : "Sign Out"}
