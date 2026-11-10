@@ -130,14 +130,14 @@ const LogsPage = () => {
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <Terminal className="text-[#00D5FF]" size={24} />
-            <h1 className="text-3xl font-bold text-white tracking-tight">System & Audit Logs</h1>
+            <h1 className="text-3xl font-bold text-foreground tracking-tight">System & Audit Logs</h1>
           </div>
-          <p className="text-zinc-500 text-sm">Monitor real-time server process stdout stream and transaction event history.</p>
+          <p className="text-muted text-sm">Monitor real-time server process stdout stream and transaction event history.</p>
         </div>
 
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-white/5 border border-white/5 px-4 py-2 rounded-xl">
-            <span className="text-xs text-zinc-400 font-medium">Auto-Refresh (5s)</span>
+          <div className="flex items-center gap-2 bg-surface border border-border px-4 py-2 rounded-xl">
+            <span className="text-xs text-muted font-medium">Auto-Refresh (5s)</span>
             <Switch 
               size="sm" 
               color="primary"
@@ -149,7 +149,7 @@ const LogsPage = () => {
           <Button 
             size="sm" 
             variant="flat" 
-            className="bg-white/5 text-zinc-300 border border-white/10 h-10 px-4 font-bold"
+            className="bg-surface text-foreground border border-border h-10 px-4 font-bold"
             startContent={<RefreshCw size={14} className={isRefreshing ? "animate-spin" : ""} />}
             onPress={() => fetchLogs(true)}
             isLoading={isRefreshing}
@@ -160,7 +160,7 @@ const LogsPage = () => {
           <Button 
             size="sm" 
             variant="flat" 
-            className="bg-white/5 text-zinc-300 border border-white/10 h-10 px-4 font-bold"
+            className="bg-surface text-foreground border border-border h-10 px-4 font-bold"
             startContent={<Copy size={14} />}
             onPress={handleCopy}
           >
@@ -180,24 +180,24 @@ const LogsPage = () => {
       </div>
 
       <div className="grid grid-cols-1 gap-6">
-        <Card className="bg-zinc-950 border-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden border-t-[#00D5FF]/20 border-t-2">
+        <Card className="bg-background border-border shadow-2xl overflow-hidden border-t-[#00D5FF]/20 border-t-2">
           <CardBody className="p-6 space-y-6">
             <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
-              <ButtonGroup size="sm" variant="flat" className="bg-white/5 p-1 rounded-xl border border-white/5">
+              <ButtonGroup size="sm" variant="flat" className="bg-surface p-1 rounded-xl border border-border">
                 <Button 
-                  className={selectedTab === "all" ? "bg-white/10 text-white font-bold rounded-lg" : "text-zinc-500 font-medium"}
+                  className={selectedTab === "all" ? "bg-surface-hover text-foreground font-bold rounded-lg" : "text-muted font-medium"}
                   onPress={() => setSelectedTab("all")}
                 >
                   All Logs
                 </Button>
                 <Button 
-                  className={selectedTab === "process" ? "bg-white/10 text-white font-bold rounded-lg" : "text-zinc-500 font-medium"}
+                  className={selectedTab === "process" ? "bg-surface-hover text-foreground font-bold rounded-lg" : "text-muted font-medium"}
                   onPress={() => setSelectedTab("process")}
                 >
                   Process Log
                 </Button>
                 <Button 
-                  className={selectedTab === "audit" ? "bg-white/10 text-white font-bold rounded-lg" : "text-zinc-500 font-medium"}
+                  className={selectedTab === "audit" ? "bg-surface-hover text-foreground font-bold rounded-lg" : "text-muted font-medium"}
                   onPress={() => setSelectedTab("audit")}
                 >
                   Audit Stream
@@ -210,35 +210,38 @@ const LogsPage = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 classNames={{
-                  inputWrapper: "bg-white/5 border-white/10 hover:bg-white/10 transition-colors w-72 h-10",
-                  input: "text-zinc-300 text-xs"
+                  inputWrapper: "bg-surface border-border hover:bg-surface-hover transition-colors w-72 h-10",
+                  input: "text-foreground text-xs"
                 }}
-                startContent={<Search size={14} className="text-zinc-500" />}
+                startContent={<Search size={14} className="text-muted" />}
               />
             </div>
 
             {isLoading ? (
-              <div className="flex flex-col h-[500px] items-center justify-center bg-black/30 border border-white/5 rounded-2xl">
+              <div className="flex flex-col h-[500px] items-center justify-center bg-[#0a0a0c] border border-border rounded-2xl">
                 <Spinner size="lg" color="primary" />
-                <p className="text-zinc-500 text-xs mt-3 font-mono">Loading developer console streams...</p>
+                <p className="text-zinc-400 text-xs mt-3 font-mono">Loading developer console streams...</p>
               </div>
             ) : (
-              <div className="border border-white/5 rounded-2xl overflow-hidden">
-                <div className="bg-white/5 p-3 px-4 flex items-center justify-between border-b border-white/5">
+              <div className="border border-border rounded-2xl overflow-hidden">
+                <div className="bg-surface p-3 px-4 flex items-center justify-between border-b border-border">
                   <div className="flex items-center gap-2">
                     <FileText size={12} className="text-[#00D5FF]" />
-                    <span className="text-[10px] font-mono font-bold text-zinc-500 uppercase tracking-widest">
+                    <span className="text-[10px] font-mono font-bold text-muted uppercase tracking-widest">
                       {selectedTab === "all" ? "Combined Stream" : selectedTab === "process" ? "Process Output" : "Transaction Event Audit Stream"}
                     </span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <span className="text-[9px] font-mono text-zinc-600 bg-black/40 px-2 py-0.5 rounded border border-white/5">
+                    <span className="text-[9px] font-mono text-muted bg-surface-hover px-2 py-0.5 rounded border border-border">
                       {filteredLines.length} Lines Rendered
                     </span>
                   </div>
                 </div>
 
-                <div className="h-[600px] bg-black/60 p-6 font-mono text-xs overflow-y-auto leading-6 select-text text-zinc-300 scrollbar-thin scrollbar-thumb-white/10">
+                {/* Always dark, like a real terminal/console — a log viewer
+                    that flips to a white background would be unreadable and
+                    doesn't match the convention these are styled after. */}
+                <div className="h-[600px] bg-[#0a0a0c] p-6 font-mono text-xs overflow-y-auto leading-6 select-text text-zinc-300 scrollbar-thin scrollbar-thumb-white/10">
                   <div className="space-y-1">
                     {filteredLines.map((line, i) => {
                       let colorClass = "text-zinc-400";
@@ -254,7 +257,7 @@ const LogsPage = () => {
                       }
 
                       return (
-                        <div key={i} className="flex gap-4 hover:bg-white/5 py-0.5 px-2 rounded transition-colors group">
+                        <div key={i} className="flex gap-4 hover:bg-surface-hover py-0.5 px-2 rounded transition-colors group">
                           <span className="w-8 text-[10px] text-zinc-700 select-none text-right opacity-40 group-hover:opacity-100">{i + 1}</span>
                           <span className={`${colorClass} flex-1 whitespace-pre-wrap`}>{line}</span>
                         </div>

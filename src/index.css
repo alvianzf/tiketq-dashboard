@@ -2,8 +2,64 @@
 
 @source "../node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}";
 
+/* Theme is class-based (.dark / .light on <html>), not OS-preference-based,
+   so the toggle actually controls what renders regardless of system setting. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #f7f8fa;
+  --surface: #ffffff;
+  --surface-hover: #f1f3f6;
+  --foreground: #16181d;
+  --muted: #6b7280;
+  --border: #e5e7eb;
+  --sidebar: #ffffff;
+  --sidebar-foreground: #16181d;
+  --primary: #4267b2;
+  --primary-foreground: #ffffff;
+  --accent: #0ad1ff;
+  --ring: #4267b2;
+}
+
+.dark {
+  --background: #09090b;
+  --surface: #17181c;
+  --surface-hover: #1f2024;
+  --foreground: #f4f4f5;
+  --muted: #9ca3af;
+  --border: rgba(255, 255, 255, 0.08);
+  --sidebar: #0c0d10;
+  --sidebar-foreground: #f4f4f5;
+  --primary: #5a7ec4;
+  --primary-foreground: #ffffff;
+  --accent: #0ad1ff;
+  --ring: #5a7ec4;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-foreground: var(--foreground);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-brand: var(--primary);
+  --color-brand-foreground: var(--primary-foreground);
+  --color-accent: var(--accent);
+  --color-ring: var(--ring);
+}
+
 @layer base {
   body {
-    @apply bg-zinc-950 text-zinc-100 antialiased;
+    @apply bg-background text-foreground antialiased;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+}
+
+@layer utilities {
+  .surface-card {
+    @apply bg-surface border border-border rounded-2xl;
   }
 }

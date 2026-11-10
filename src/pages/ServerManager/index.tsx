@@ -294,7 +294,7 @@ const ServerManager = () => {
     
     if (file.isDir) {
        if (file.hasPackageJson) return <Package size={14} className="text-green-400" />;
-       if (file.name === 'node_modules') return <Cpu size={14} className="text-zinc-500" />;
+       if (file.name === 'node_modules') return <Cpu size={14} className="text-muted" />;
        if (file.name === 'src' || file.name === 'app' || file.name === 'routes') return <Code2 size={14} className="text-blue-400" />;
        if (file.name === 'public' || file.name === 'assets') return <Layout size={14} className="text-orange-400" />;
        if (file.name === 'prisma' || file.name === 'db') return <Database size={14} className="text-purple-400" />;
@@ -326,7 +326,7 @@ const ServerManager = () => {
         return <Image size={14} className="text-yellow-400" />;
       case 'env':
       case 'config':
-        return <Settings size={14} className="text-zinc-400" />;
+        return <Settings size={14} className="text-muted" />;
       case 'sh':
       case 'bash':
         return <Terminal size={14} className="text-green-500" />;
@@ -335,7 +335,7 @@ const ServerManager = () => {
       case 'tar':
         return <FileArchive size={14} className="text-red-500" />;
       default:
-        return <FileText size={14} className="text-zinc-500" />;
+        return <FileText size={14} className="text-muted" />;
     }
   };
 
@@ -346,9 +346,9 @@ const ServerManager = () => {
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <ShieldCheck className="text-blue-400" size={24} />
-          <h1 className="text-3xl font-bold text-white tracking-tight">Infrastructure Hub</h1>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Infrastructure Hub</h1>
         </div>
-        <div className="flex items-center gap-2 text-zinc-500">
+        <div className="flex items-center gap-2 text-muted">
            <History size={14} className="text-orange-400/70" />
            <p className="text-xs italic">Adaptive session memory active (restored path: /{currentPath || 'root'})</p>
         </div>
@@ -356,7 +356,7 @@ const ServerManager = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* PM2 Processes - 2/3 width */}
-        <Card className="lg:col-span-2 bg-white/5 border-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden border-t-blue-500/20 border-t-2">
+        <Card className="lg:col-span-2 bg-surface border-border shadow-2xl overflow-hidden border-t-blue-500/20 border-t-2">
           <CardBody className="p-6">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
@@ -364,15 +364,15 @@ const ServerManager = () => {
                   <Activity size={18} />
                 </div>
                 <div className="flex flex-col">
-                  <h3 className="text-lg font-bold text-white tracking-tight">Active Processes</h3>
-                  <p className="text-[9px] text-zinc-500 font-mono tracking-widest uppercase">Lifecycle Manager</p>
+                  <h3 className="text-lg font-bold text-foreground tracking-tight">Active Processes</h3>
+                  <p className="text-[9px] text-muted font-mono tracking-widest uppercase">Lifecycle Manager</p>
                 </div>
               </div>
               
               <Button 
                 size="sm" 
                 variant="flat" 
-                className="bg-white/5 text-zinc-300 border border-white/10 h-8 px-4 font-bold text-[10px]"
+                className="bg-surface text-foreground border border-border h-8 px-4 font-bold text-[10px]"
                 startContent={<RefreshCw size={12} className={isRefreshingPM2 ? "animate-spin" : ""} />}
                 onPress={fetchProcesses}
                 isLoading={isRefreshingPM2}
@@ -387,22 +387,22 @@ const ServerManager = () => {
               removeWrapper
             >
               <TableHeader>
-                <TableColumn className="bg-white/5 border-b border-white/10 text-zinc-500 text-[10px] font-bold uppercase tracking-widest">ID / Name</TableColumn>
-                <TableColumn className="bg-white/5 border-b border-white/10 text-zinc-500 text-[10px] font-bold uppercase tracking-widest">Status</TableColumn>
-                <TableColumn className="bg-white/5 border-b border-white/10 text-zinc-500 text-[10px] font-bold uppercase tracking-widest text-center">Load</TableColumn>
-                <TableColumn className="bg-white/5 border-b border-white/10 text-zinc-500 text-[10px] font-bold uppercase tracking-widest text-right">Actions</TableColumn>
+                <TableColumn className="bg-surface border-b border-border text-muted text-[10px] font-bold uppercase tracking-widest">ID / Name</TableColumn>
+                <TableColumn className="bg-surface border-b border-border text-muted text-[10px] font-bold uppercase tracking-widest">Status</TableColumn>
+                <TableColumn className="bg-surface border-b border-border text-muted text-[10px] font-bold uppercase tracking-widest text-center">Load</TableColumn>
+                <TableColumn className="bg-surface border-b border-border text-muted text-[10px] font-bold uppercase tracking-widest text-right">Actions</TableColumn>
               </TableHeader>
               <TableBody emptyContent={isRefreshingPM2 ? "Refreshing..." : "No active processes."}>
                 {processes.map((proc, i) => (
-                  <TableRow key={i} className="group hover:bg-white/5 transition-all border-b border-white/5 last:border-0">
+                  <TableRow key={i} className="group hover:bg-surface-hover transition-all border-b border-border last:border-0">
                     <TableCell>
                       <div className="flex items-center gap-3">
-                        <div className="w-7 h-7 rounded-lg bg-zinc-900 border border-white/10 flex items-center justify-center font-mono text-blue-400 text-[10px] shadow-inner">
+                        <div className="w-7 h-7 rounded-lg bg-surface border border-border flex items-center justify-center font-mono text-blue-400 text-[10px] shadow-inner">
                           {proc.pm_id}
                         </div>
                         <div className="flex flex-col">
-                          <span className="text-xs font-bold text-white truncate max-w-[120px]">{proc.name}</span>
-                          <span className="text-[9px] text-zinc-500 font-mono">PID {proc.pid}</span>
+                          <span className="text-xs font-bold text-foreground truncate max-w-[120px]">{proc.name}</span>
+                          <span className="text-[9px] text-muted font-mono">PID {proc.pid}</span>
                         </div>
                       </div>
                     </TableCell>
@@ -419,10 +419,10 @@ const ServerManager = () => {
                     </TableCell>
                     <TableCell>
                       <div className="flex items-center justify-center gap-3">
-                        <div className="flex items-center gap-1 text-[10px] font-mono font-bold text-white">
+                        <div className="flex items-center gap-1 text-[10px] font-mono font-bold text-foreground">
                            <Cpu size={10} className="text-blue-500" /> {proc.monit.cpu}%
                         </div>
-                        <div className="flex items-center gap-1 text-[10px] font-mono font-bold text-white">
+                        <div className="flex items-center gap-1 text-[10px] font-mono font-bold text-foreground">
                            <Database size={10} className="text-purple-500" /> {(proc.monit.memory / 1024 / 1024).toFixed(0)}MB
                         </div>
                       </div>
@@ -448,15 +448,15 @@ const ServerManager = () => {
         </Card>
 
         {/* System Health - 1/3 width */}
-        <Card className="bg-white/5 border-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden border-t-green-500/20 border-t-2">
+        <Card className="bg-surface border-border shadow-2xl overflow-hidden border-t-green-500/20 border-t-2">
           <CardBody className="p-6">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 rounded-xl bg-green-500/10 border border-green-500/20 text-green-400 shadow-inner">
                 <ShieldCheck size={18} />
               </div>
               <div className="flex flex-col">
-                <h3 className="text-lg font-bold text-white tracking-tight">System Health</h3>
-                <p className="text-[9px] text-zinc-500 font-mono tracking-widest uppercase">VPS Telemetry</p>
+                <h3 className="text-lg font-bold text-foreground tracking-tight">System Health</h3>
+                <p className="text-[9px] text-muted font-mono tracking-widest uppercase">VPS Telemetry</p>
               </div>
             </div>
 
@@ -469,26 +469,26 @@ const ServerManager = () => {
               <div className="space-y-6">
                 <div className="space-y-2">
                   <div className="flex justify-between items-end">
-                    <div className="flex items-center gap-2 text-zinc-300">
+                    <div className="flex items-center gap-2 text-foreground">
                       <Cpu size={14} className="text-blue-500" />
                       <span className="text-[10px] font-bold uppercase tracking-wider">CPU Utilization</span>
                     </div>
-                    <span className="text-xs font-mono font-bold text-white">{health.cpu.load}%</span>
+                    <span className="text-xs font-mono font-bold text-foreground">{health.cpu.load}%</span>
                   </div>
                   <Progress size="sm" color="primary" value={parseFloat(health.cpu.load)} className="max-w-md h-1.5" />
-                  <p className="text-[8px] text-zinc-600 font-mono text-right italic">{health.cpu.cores} Physical Cores Active</p>
+                  <p className="text-[8px] text-muted font-mono text-right italic">{health.cpu.cores} Physical Cores Active</p>
                 </div>
 
                 <div className="space-y-2">
                   <div className="flex justify-between items-end">
-                    <div className="flex items-center gap-2 text-zinc-300">
+                    <div className="flex items-center gap-2 text-foreground">
                       <Database size={14} className="text-purple-500" />
                       <span className="text-[10px] font-bold uppercase tracking-wider">Memory Pressure</span>
                     </div>
-                    <span className="text-xs font-mono font-bold text-white">{health.memory.percent}%</span>
+                    <span className="text-xs font-mono font-bold text-foreground">{health.memory.percent}%</span>
                   </div>
                   <Progress size="sm" color="secondary" value={parseFloat(health.memory.percent)} className="max-w-md h-1.5" />
-                  <div className="flex justify-between text-[8px] text-zinc-600 font-mono">
+                  <div className="flex justify-between text-[8px] text-muted font-mono">
                      <span>{health.memory.used}MB USED</span>
                      <span>{health.memory.total}MB TOTAL</span>
                   </div>
@@ -496,11 +496,11 @@ const ServerManager = () => {
 
                 <div className="space-y-2">
                   <div className="flex justify-between items-end">
-                    <div className="flex items-center gap-2 text-zinc-300">
+                    <div className="flex items-center gap-2 text-foreground">
                       <HardDrive size={14} className="text-orange-500" />
                       <span className="text-[10px] font-bold uppercase tracking-wider">Root Storage</span>
                     </div>
-                    <span className="text-xs font-mono font-bold text-white">{health.disk.percent}</span>
+                    <span className="text-xs font-mono font-bold text-foreground">{health.disk.percent}</span>
                   </div>
                   <Progress 
                     size="sm" 
@@ -508,16 +508,16 @@ const ServerManager = () => {
                     value={parseInt(health.disk.percent)} 
                     className="max-w-md h-1.5" 
                   />
-                   <div className="flex justify-between text-[8px] text-zinc-600 font-mono">
+                   <div className="flex justify-between text-[8px] text-muted font-mono">
                      <span>{health.disk.available} AVAILABLE</span>
                      <span>{health.disk.total} TOTAL</span>
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-white/5 flex items-center justify-between">
+                <div className="pt-4 border-t border-border flex items-center justify-between">
                    <div className="flex items-center gap-2">
-                      <Clock size={14} className="text-zinc-500" />
-                      <span className="text-[10px] font-bold text-zinc-500 uppercase">Uptime</span>
+                      <Clock size={14} className="text-muted" />
+                      <span className="text-[10px] font-bold text-muted uppercase">Uptime</span>
                    </div>
                    <span className="text-xs font-mono font-bold text-green-400">{health.uptime} Hours</span>
                 </div>
@@ -529,34 +529,34 @@ const ServerManager = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
         {/* Project Explorer - 3/4 width */}
-        <Card className="lg:col-span-3 bg-white/5 border-white/10 backdrop-blur-2xl shadow-2xl border-t-zinc-500/20 border-t-2">
+        <Card className="lg:col-span-3 bg-surface border-border shadow-2xl border-t-zinc-500/20 border-t-2">
           <CardBody className="p-8">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
                 <div className="p-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-400 shadow-inner">
                   <Folder size={20} />
                 </div>
-                <h3 className="text-xl font-bold text-white tracking-tight">System Navigator</h3>
+                <h3 className="text-xl font-bold text-foreground tracking-tight">System Navigator</h3>
               </div>
               
               <Breadcrumbs variant="light" size="sm" classNames={{ list: "gap-1" }}>
                 <BreadcrumbItem onClick={() => handleFolderClick("")}>
-                  <div className="p-1 px-3 rounded-md bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-zinc-400 cursor-pointer text-[10px]">ROOT</div>
+                  <div className="p-1 px-3 rounded-md bg-surface border border-border hover:bg-surface-hover transition-colors text-muted cursor-pointer text-[10px]">ROOT</div>
                 </BreadcrumbItem>
                 {breadcrumbItems.map((item, index) => (
                   <BreadcrumbItem 
                     key={index} 
                     onClick={() => handleFolderClick(breadcrumbItems.slice(0, index + 1).join("/"))}
                   >
-                    <div className="p-1 px-3 rounded-md bg-white/5 border border-white/10 hover:bg-white/10 transition-colors text-zinc-400 cursor-pointer text-[10px] uppercase tracking-wider">{item}</div>
+                    <div className="p-1 px-3 rounded-md bg-surface border border-border hover:bg-surface-hover transition-colors text-muted cursor-pointer text-[10px] uppercase tracking-wider">{item}</div>
                   </BreadcrumbItem>
                 ))}
               </Breadcrumbs>
             </div>
 
-            <div className="min-h-[600px] border border-white/5 rounded-2xl bg-black/20 overflow-hidden relative">
+            <div className="min-h-[600px] border border-border rounded-2xl bg-surface overflow-hidden relative">
               {isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center z-10 backdrop-blur-sm bg-black/20">
+                <div className="absolute inset-0 flex items-center justify-center z-10 bg-surface/80">
                   <Spinner size="lg" color="warning" />
                 </div>
               )}
@@ -568,24 +568,24 @@ const ServerManager = () => {
                 selectionMode="single"
               >
                 <TableHeader>
-                  <TableColumn className="bg-white/5 border-b border-white/10 text-zinc-500 text-[10px] font-bold uppercase tracking-widest h-12">Name</TableColumn>
-                  <TableColumn className="bg-white/5 border-b border-white/10 text-zinc-500 text-[10px] font-bold uppercase tracking-widest h-12 text-right px-8">Actions</TableColumn>
+                  <TableColumn className="bg-surface border-b border-border text-muted text-[10px] font-bold uppercase tracking-widest h-12">Name</TableColumn>
+                  <TableColumn className="bg-surface border-b border-border text-muted text-[10px] font-bold uppercase tracking-widest h-12 text-right px-8">Actions</TableColumn>
                 </TableHeader>
                 <TableBody emptyContent={"Segment is empty."}>
                   {files.map((file, i) => (
                     <TableRow 
                       key={i} 
-                      className="group hover:bg-white/5 transition-all border-b border-white/5 last:border-0"
+                      className="group hover:bg-surface-hover transition-all border-b border-border last:border-0"
                       onDoubleClick={() => file.isDir ? handleFolderClick(file.path) : handleFileView(file)}
                     >
                       <TableCell>
                         <div className="flex items-center gap-3">
-                          <div className="bg-white/5 p-2 rounded-lg flex items-center justify-center">
+                          <div className="bg-surface p-2 rounded-lg flex items-center justify-center">
                             {renderFileIcon(file)}
                           </div>
                           <div className="flex flex-col">
                             <div className="flex items-center gap-2">
-                              <span className="text-xs font-semibold text-white">{file.name}</span>
+                              <span className="text-xs font-semibold text-foreground">{file.name}</span>
                               {file.isDir && file.hasPackageJson && (
                                 <Chip size="sm" variant="flat" color="success" className="h-4 text-[8px] font-bold">Node.js</Chip>
                               )}
@@ -595,13 +595,13 @@ const ServerManager = () => {
                       </TableCell>
                       <TableCell className="text-right px-8">
                         <div className="flex items-center justify-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <Button isIconOnly size="sm" variant="light" className="text-zinc-500 hover:text-white" onPress={() => file.isDir ? handleFolderClick(file.path) : handleFileView(file)}>
+                          <Button isIconOnly size="sm" variant="light" className="text-muted hover:text-foreground" onPress={() => file.isDir ? handleFolderClick(file.path) : handleFileView(file)}>
                             {file.isDir ? <RefreshCw size={12} /> : <Edit size={12} />}
                           </Button>
-                          <Button isIconOnly size="sm" variant="light" className="text-zinc-500 hover:text-blue-400" onPress={() => moveItem(file.path, file.name)}>
+                          <Button isIconOnly size="sm" variant="light" className="text-muted hover:text-blue-400" onPress={() => moveItem(file.path, file.name)}>
                             <Move size={12} />
                           </Button>
-                          <Button isIconOnly size="sm" variant="light" className="text-zinc-500 hover:text-red-400" onPress={() => deleteItem(file.path, file.name)}>
+                          <Button isIconOnly size="sm" variant="light" className="text-muted hover:text-red-400" onPress={() => deleteItem(file.path, file.name)}>
                             <Trash2 size={12} />
                           </Button>
                         </div>
@@ -616,13 +616,13 @@ const ServerManager = () => {
 
         {/* Maintenance Deck - 1/4 width */}
         <div className="lg:col-span-1 space-y-6">
-          <Card className="bg-white/5 border-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden border-t-blue-500/20 border-t-2">
+          <Card className="bg-surface border-border shadow-2xl overflow-hidden border-t-blue-500/20 border-t-2">
             <CardBody className="p-6 space-y-6">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 shadow-inner">
                   <Terminal size={18} />
                 </div>
-                <h3 className="text-lg font-bold text-white">Maintenance</h3>
+                <h3 className="text-lg font-bold text-foreground">Maintenance</h3>
               </div>
 
               <div className="space-y-4">
@@ -632,7 +632,7 @@ const ServerManager = () => {
                       placeholder="Git URL for Clone"
                       value={gitUrl}
                       onChange={(e) => setGitUrl(e.target.value)}
-                      classNames={{ inputWrapper: "bg-white/5 border-white/10 h-8 text-[11px]" }}
+                      classNames={{ inputWrapper: "bg-surface border-border h-8 text-[11px]" }}
                     />
                     <Button 
                       size="sm" 
@@ -647,8 +647,8 @@ const ServerManager = () => {
                  </div>
 
                  <div className="grid grid-cols-2 gap-2">
-                    <Button variant="flat" size="sm" className="bg-white/5 text-zinc-400 h-8 text-[10px]" startContent={<GitPullRequest size={12} />} onPress={() => executeCommand("git-pull")} isLoading={isExecuting}>PULL</Button>
-                    <Button variant="flat" size="sm" className="bg-white/5 text-zinc-400 h-8 text-[10px]" startContent={<Undo2 size={12} />} onPress={() => executeCommand("git-restore")} isLoading={isExecuting}>RESET</Button>
+                    <Button variant="flat" size="sm" className="bg-surface text-muted h-8 text-[10px]" startContent={<GitPullRequest size={12} />} onPress={() => executeCommand("git-pull")} isLoading={isExecuting}>PULL</Button>
+                    <Button variant="flat" size="sm" className="bg-surface text-muted h-8 text-[10px]" startContent={<Undo2 size={12} />} onPress={() => executeCommand("git-restore")} isLoading={isExecuting}>RESET</Button>
                  </div>
 
                  <div className="space-y-2 pt-2">
@@ -657,34 +657,35 @@ const ServerManager = () => {
                  </div>
               </div>
 
-              <div className="pt-4 border-t border-white/5 space-y-2">
+              <div className="pt-4 border-t border-border space-y-2">
                  <div className="flex items-center justify-between pl-1">
-                    <p className="text-[9px] text-zinc-500 font-bold uppercase tracking-widest ">Prisma Engine</p>
-                    <Database size={10} className="text-zinc-600" />
+                    <p className="text-[9px] text-muted font-bold uppercase tracking-widest ">Prisma Engine</p>
+                    <Database size={10} className="text-muted" />
                  </div>
-                 <Button size="sm" variant="flat" className="bg-white/5 text-zinc-400 font-bold w-full text-[10px] h-8" startContent={<DatabaseBackup size={12} />} onPress={() => executeCommand("prisma-generate")} isLoading={isExecuting}>SCHEMA SYNC</Button>
-                 <Button size="sm" variant="flat" className="bg-white/5 text-zinc-400 font-bold w-full text-[10px] h-8" startContent={<ChevronRight size={12} />} onPress={() => executeCommand("prisma-migrate")} isLoading={isExecuting}>MIGRATE EXEC</Button>
+                 <Button size="sm" variant="flat" className="bg-surface text-muted font-bold w-full text-[10px] h-8" startContent={<DatabaseBackup size={12} />} onPress={() => executeCommand("prisma-generate")} isLoading={isExecuting}>SCHEMA SYNC</Button>
+                 <Button size="sm" variant="flat" className="bg-surface text-muted font-bold w-full text-[10px] h-8" startContent={<ChevronRight size={12} />} onPress={() => executeCommand("prisma-migrate")} isLoading={isExecuting}>MIGRATE EXEC</Button>
               </div>
             </CardBody>
           </Card>
 
-          <Card className="bg-zinc-950 border-white/5 shadow-2xl border-t-2 border-t-green-500/20">
+          <Card className="bg-background border-border shadow-2xl border-t-2 border-t-green-500/20">
             <CardBody className="p-0">
-               <div className="p-3 bg-white/5 border-b border-white/5 flex items-center justify-between">
+               <div className="p-3 bg-surface border-b border-border flex items-center justify-between">
                   <div className="flex items-center gap-2">
                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
-                     <span className="text-[9px] font-bold text-zinc-500 uppercase tracking-widest">Shell Console</span>
+                     <span className="text-[9px] font-bold text-muted uppercase tracking-widest">Shell Console</span>
                   </div>
-                  <button onClick={() => setLogs([])} className="text-[9px] text-zinc-700 hover:text-white">CLEAR</button>
+                  <button onClick={() => setLogs([])} className="text-[9px] text-zinc-500 hover:text-foreground">CLEAR</button>
                </div>
-               <div className="h-[250px] p-4 font-mono text-[9px] overflow-y-auto text-green-400/80 bg-black/40">
+               {/* Always dark, like a real terminal — see the same note on System Logs' console pane. */}
+               <div className="h-[250px] p-4 font-mono text-[9px] overflow-y-auto text-green-400/80 bg-[#0a0a0c]">
                   <div className="space-y-1">
                     {logs.map((log, i) => <div key={i} className="flex gap-2"><span className="opacity-20">{i+1}</span>{log}</div>)}
                     <div ref={logEndRef} className="w-1.5 h-3 bg-green-500 animate-pulse mt-1" />
                   </div>
                </div>
-               <div className="p-2 px-3 bg-zinc-900/50 border-t border-white/5 flex gap-2 items-center">
-                  <Terminal size={12} className="text-zinc-600" />
+               <div className="p-2 px-3 bg-surface-hover border-t border-border flex gap-2 items-center">
+                  <Terminal size={12} className="text-muted" />
                   <Input 
                     size="sm" 
                     variant="underlined" 
@@ -693,7 +694,7 @@ const ServerManager = () => {
                     value={rawCommand}
                     onChange={(e) => setRawCommand(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && executeCommand("raw")}
-                    classNames={{ input: "text-zinc-400 font-mono text-[10px] h-6" }}
+                    classNames={{ input: "text-muted font-mono text-[10px] h-6" }}
                   />
                </div>
             </CardBody>
@@ -708,11 +709,11 @@ const ServerManager = () => {
         backdrop="blur" 
         scrollBehavior="inside"
         classNames={{
-          base: "bg-zinc-950 border border-white/10 text-white shadow-2xl",
-          header: "border-b border-white/5 py-4 px-8",
+          base: "bg-background border border-border text-foreground shadow-2xl",
+          header: "border-b border-border py-4 px-8",
           body: "p-0",
-          footer: "border-t border-white/5 p-4",
-          closeButton: "hover:bg-white/10 text-zinc-500 m-4"
+          footer: "border-t border-border p-4",
+          closeButton: "hover:bg-surface-hover text-muted m-4"
         }}
       >
         <ModalContent>
@@ -723,8 +724,8 @@ const ServerManager = () => {
                    <FileText size={18} />
                  </div>
                  <div className="flex flex-col">
-                   <span className="text-lg font-bold text-white tracking-tight">{selectedFileName}</span>
-                   <p className="text-[9px] text-zinc-500 font-mono uppercase tracking-widest">Source Edit Mode</p>
+                   <span className="text-lg font-bold text-foreground tracking-tight">{selectedFileName}</span>
+                   <p className="text-[9px] text-muted font-mono uppercase tracking-widest">Source Edit Mode</p>
                  </div>
                </div>
                <div className="pr-10">
@@ -740,14 +741,14 @@ const ServerManager = () => {
                   </Button>
                </div>
              </div>
-             <div className="pt-4 mt-2 border-t border-white/5 flex gap-2">
+             <div className="pt-4 mt-2 border-t border-border flex gap-2">
                   <Input 
                     size="sm" 
                     placeholder="PM2 Name / ID" 
                     className="w-1/2"
                     classNames={{
-                      input: "bg-transparent text-white",
-                      inputWrapper: "bg-white/5 border-white/10 group-data-[focus=true]:border-blue-500/50 h-10 text-xs"
+                      input: "bg-transparent text-foreground",
+                      inputWrapper: "bg-surface border-border group-data-[focus=true]:border-blue-500/50 h-10 text-xs"
                     }}
                   />
                   <Button 
@@ -765,14 +766,14 @@ const ServerManager = () => {
                 </div>
           </ModalHeader>
           <ModalBody>
-            <div className="bg-black/90 min-h-[500px] relative group border-t border-white/5">
-              <div className="absolute top-0 left-0 w-10 h-full bg-white/5 border-r border-white/10 flex flex-col items-center pt-6 text-[9px] text-zinc-700 font-mono select-none">
+            <div className="bg-[#0a0a0c] min-h-[500px] relative group border-t border-border">
+              <div className="absolute top-0 left-0 w-10 h-full bg-black/30 border-r border-white/10 flex flex-col items-center pt-6 text-[9px] text-zinc-600 font-mono select-none">
                 {editingContent.split('\n').map((_, i) => (
                   <div key={i} className="h-5 leading-5">{i + 1}</div>
                 ))}
               </div>
               <textarea
-                className="w-full h-full bg-transparent pl-14 p-6 font-mono text-[12px] leading-5 text-zinc-300 outline-none resize-none min-h-[500px] scrollbar-thin scrollbar-thumb-white/10"
+                className="w-full h-full bg-transparent pl-14 p-6 font-mono text-[12px] leading-5 text-zinc-200 outline-none resize-none min-h-[500px] scrollbar-thin scrollbar-thumb-white/10"
                 value={editingContent}
                 onChange={(e) => setEditingContent(e.target.value)}
                 spellCheck={false}

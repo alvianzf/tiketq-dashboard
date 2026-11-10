@@ -7,7 +7,7 @@ const ProtectedRoute = () => {
 
   if (isLoading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-zinc-950">
+      <div className="flex h-screen items-center justify-center bg-background">
         <Spinner size="lg" color="primary" />
       </div>
     );

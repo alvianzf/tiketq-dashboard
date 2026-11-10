@@ -64,10 +64,10 @@ const AddUserModal = ({
       onOpenChange={onOpenChange}
       backdrop="blur"
       classNames={{
-        base: "bg-zinc-900/90 border border-white/10 backdrop-blur-3xl shadow-2xl",
-        header: "text-white border-b border-white/5 px-8 pt-8 pb-6",
+        base: "bg-surface/90 border border-border backdrop-blur-3xl shadow-2xl",
+        header: "text-foreground border-b border-border px-8 pt-8 pb-6",
         body: "py-6 px-8",
-        footer: "border-t border-white/5 px-8 pb-8 pt-6 gap-3",
+        footer: "border-t border-border px-8 pb-8 pt-6 gap-3",
       }}
     >
       <ModalContent>
@@ -78,8 +78,8 @@ const AddUserModal = ({
                 <UserPlus size={20} className="text-blue-400" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">Add New Administrator</h2>
-                <p className="text-sm text-zinc-500 font-normal mt-0.5">Create a new dashboard user account.</p>
+                <h2 className="text-xl font-bold text-foreground">Add New Administrator</h2>
+                <p className="text-sm text-muted font-normal mt-0.5">Create a new dashboard user account.</p>
               </div>
             </ModalHeader>
             <ModalBody className="gap-5">
@@ -90,11 +90,11 @@ const AddUserModal = ({
                 variant="bordered"
                 value={username}
                 onValueChange={setUsername}
-                startContent={<UserIcon size={16} className="text-zinc-500" />}
+                startContent={<UserIcon size={16} className="text-muted" />}
                 classNames={{
-                  label: "text-zinc-400 font-medium pb-5",
-                  input: "text-white",
-                  inputWrapper: "border-white/10 hover:border-white/20 focus-within:!border-blue-500/60 bg-white/5",
+                  label: "text-muted font-medium pb-5",
+                  input: "text-foreground",
+                  inputWrapper: "border-border hover:border-white/20 focus-within:!border-blue-500/60 bg-surface",
                 }}
               />
               <Input
@@ -104,20 +104,20 @@ const AddUserModal = ({
                 variant="bordered"
                 value={password}
                 onValueChange={setPassword}
-                startContent={<Key size={16} className="text-zinc-500" />}
+                startContent={<Key size={16} className="text-muted" />}
                 classNames={{
-                  label: "text-zinc-400 font-medium pb-5",
-                  input: "text-white",
-                  inputWrapper: "border-white/10 hover:border-white/20 focus-within:!border-blue-500/60 bg-white/5",
+                  label: "text-muted font-medium pb-5",
+                  input: "text-foreground",
+                  inputWrapper: "border-border hover:border-white/20 focus-within:!border-blue-500/60 bg-surface",
                 }}
               />
               <div className="flex items-center gap-2 px-1 py-2 bg-blue-500/5 rounded-xl border border-blue-500/10">
                 <Shield size={14} className="text-blue-400 shrink-0" />
-                <span className="text-xs text-zinc-500">All accounts created here receive Administrator privileges.</span>
+                <span className="text-xs text-muted">All accounts created here receive Administrator privileges.</span>
               </div>
             </ModalBody>
             <ModalFooter>
-              <Button variant="flat" onPress={onClose} className="text-zinc-400 bg-white/5 border border-white/10 flex-1 h-11 font-medium">Cancel</Button>
+              <Button variant="flat" onPress={onClose} className="text-muted bg-surface border border-border flex-1 h-11 font-medium">Cancel</Button>
               <Button
                 color="primary"
                 type="submit"
@@ -179,10 +179,10 @@ const EditUserModal = ({
       onOpenChange={onClose}
       backdrop="blur"
       classNames={{
-        base: "bg-zinc-900/90 border border-white/10 backdrop-blur-3xl shadow-2xl",
-        header: "text-white border-b border-white/5 px-8 pt-8 pb-6",
+        base: "bg-surface/90 border border-border backdrop-blur-3xl shadow-2xl",
+        header: "text-foreground border-b border-border px-8 pt-8 pb-6",
         body: "py-6 px-8",
-        footer: "border-t border-white/5 px-8 pb-8 pt-6 gap-3",
+        footer: "border-t border-border px-8 pb-8 pt-6 gap-3",
       }}
     >
       <ModalContent>
@@ -193,18 +193,18 @@ const EditUserModal = ({
                 <Edit3 size={20} className="text-amber-400" />
               </div>
               <div>
-                <h2 className="text-xl font-bold text-white">Edit Administrator</h2>
-                <p className="text-sm text-zinc-500 font-normal mt-0.5">Update credentials and access levels.</p>
+                <h2 className="text-xl font-bold text-foreground">Edit Administrator</h2>
+                <p className="text-sm text-muted font-normal mt-0.5">Update credentials and access levels.</p>
               </div>
             </ModalHeader>
             <ModalBody className="gap-5">
-              <div className="flex items-center gap-3 bg-white/5 rounded-xl p-3 border border-white/5">
+              <div className="flex items-center gap-3 bg-surface rounded-xl p-3 border border-border">
                 <div className="w-9 h-9 rounded-full bg-blue-500/20 flex items-center justify-center font-bold text-blue-400 text-sm border border-blue-500/20">
                   {user?.username?.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <p className="text-white text-sm font-medium">{user?.username}</p>
-                  <p className="text-zinc-500 text-xs">ID: {user?.id}</p>
+                  <p className="text-foreground text-sm font-medium">{user?.username}</p>
+                  <p className="text-muted text-xs">ID: {user?.id}</p>
                 </div>
                 {user?.isAdmin && (
                   <Chip size="sm" className="ml-auto bg-blue-500/10 text-blue-400 border-none text-xs">Admin</Chip>
@@ -217,11 +217,11 @@ const EditUserModal = ({
                 variant="bordered"
                 value={username}
                 onValueChange={setUsername}
-                startContent={<UserIcon size={16} className="text-zinc-500" />}
+                startContent={<UserIcon size={16} className="text-muted" />}
                 classNames={{
-                  label: "text-zinc-400 font-medium pb-5",
-                  input: "text-white",
-                  inputWrapper: "border-white/10 hover:border-white/20 focus-within:!border-amber-500/60 bg-white/5",
+                  label: "text-muted font-medium pb-5",
+                  input: "text-foreground",
+                  inputWrapper: "border-border hover:border-white/20 focus-within:!border-amber-500/60 bg-surface",
                 }}
               />
               <Input
@@ -231,16 +231,16 @@ const EditUserModal = ({
                 variant="bordered"
                 value={password}
                 onValueChange={setPassword}
-                startContent={<Key size={16} className="text-zinc-500" />}
+                startContent={<Key size={16} className="text-muted" />}
                 classNames={{
-                  label: "text-zinc-400 font-medium pb-5",
-                  input: "text-white",
-                  inputWrapper: "border-white/10 hover:border-white/20 focus-within:!border-amber-500/60 bg-white/5",
+                  label: "text-muted font-medium pb-5",
+                  input: "text-foreground",
+                  inputWrapper: "border-border hover:border-white/20 focus-within:!border-amber-500/60 bg-surface",
                 }}
               />
             </ModalBody>
             <ModalFooter>
-              <Button variant="flat" onPress={onClose} className="text-zinc-400 bg-white/5 border border-white/10 flex-1 h-11 font-medium">Cancel</Button>
+              <Button variant="flat" onPress={onClose} className="text-muted bg-surface border border-border flex-1 h-11 font-medium">Cancel</Button>
               <Button
                 type="submit"
                 isLoading={updateMutation.isPending}
@@ -299,8 +299,8 @@ const UsersPage = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold text-white">User Management</h1>
-          <p className="text-zinc-500">Manage administrative accounts and system access.</p>
+          <h1 className="text-3xl font-bold text-foreground">User Management</h1>
+          <p className="text-muted">Manage administrative accounts and system access.</p>
         </div>
         <Button
           onPress={onAddOpen}
@@ -315,14 +315,14 @@ const UsersPage = () => {
       {/* Stats Row */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {[
-          { label: "Total Accounts", value: users?.length ?? 0, color: "text-white" },
+          { label: "Total Accounts", value: users?.length ?? 0, color: "text-foreground" },
           { label: "Administrators", value: users?.filter(u => u.isAdmin).length ?? 0, color: "text-blue-400" },
-          { label: "Regular Users", value: users?.filter(u => !u.isAdmin).length ?? 0, color: "text-zinc-300" },
+          { label: "Regular Users", value: users?.filter(u => !u.isAdmin).length ?? 0, color: "text-foreground" },
           { label: "Active Today", value: users?.length ?? 0, color: "text-green-400" },
         ].map((stat) => (
-          <Card key={stat.label} className="bg-white/5 border border-white/10 backdrop-blur-2xl">
+          <Card key={stat.label} className="bg-surface border border-border ">
             <CardBody className="p-4">
-              <p className="text-zinc-500 text-xs uppercase font-bold tracking-wider">{stat.label}</p>
+              <p className="text-muted text-xs uppercase font-bold tracking-wider">{stat.label}</p>
               <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
             </CardBody>
           </Card>
@@ -330,15 +330,15 @@ const UsersPage = () => {
       </div>
 
       {/* Table */}
-      <Card className="bg-white/5 border border-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden">
+      <Card className="bg-surface border border-border shadow-2xl overflow-hidden">
         <CardBody className="p-0">
           <Table
             aria-label="User management table"
             removeWrapper
             classNames={{
               base: "max-h-[600px] overflow-scroll",
-              th: "bg-white/5 text-zinc-400 border-b border-white/5 py-4 font-bold uppercase text-xs tracking-wider",
-              td: "py-4 text-zinc-300 border-b border-white/5 last:border-0",
+              th: "bg-surface text-muted border-b border-border py-4 font-bold uppercase text-xs tracking-wider",
+              td: "py-4 text-foreground border-b border-border last:border-0",
             }}
           >
             <TableHeader>
@@ -350,18 +350,18 @@ const UsersPage = () => {
             </TableHeader>
             <TableBody emptyContent="No users found">
               {(users || []).map((user: UserType) => (
-                <TableRow key={user.id} className="hover:bg-white/5 transition-colors">
+                <TableRow key={user.id} className="hover:bg-surface-hover transition-colors">
                   <TableCell>
                     <User
                       name={user.username}
                       description={`ID: ${user.id}`}
                       avatarProps={{
                         src: `https://api.dicebear.com/7.x/initials/svg?seed=${user.username}&backgroundColor=3b82f6&textColor=ffffff`,
-                        className: "border border-white/10",
+                        className: "border border-border",
                       }}
                       classNames={{
-                        name: "text-white font-medium",
-                        description: "text-zinc-500",
+                        name: "text-foreground font-medium",
+                        description: "text-muted",
                       }}
                     />
                   </TableCell>
@@ -369,12 +369,12 @@ const UsersPage = () => {
                     <div className="flex items-center gap-2">
                       {user.isAdmin
                         ? <Shield size={14} className="text-blue-400" />
-                        : <ShieldOff size={14} className="text-zinc-600" />}
+                        : <ShieldOff size={14} className="text-muted" />}
                       <span className="text-sm">{user.isAdmin ? "Administrator" : "User"}</span>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm text-zinc-500">
+                    <span className="text-sm text-muted">
                       {/* @ts-expect-error — createdAt may exist at runtime */}
                       {user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "—"}
                     </span>
@@ -393,7 +393,7 @@ const UsersPage = () => {
                           size="sm"
                           variant="flat"
                           onPress={() => setEditingUser(user)}
-                          className="bg-white/5 text-zinc-400 hover:text-amber-400 hover:bg-amber-500/10 border border-white/5 transition-all"
+                          className="bg-surface text-muted hover:text-amber-400 hover:bg-amber-500/10 border border-border transition-all"
                         >
                           <Edit3 size={15} />
                         </Button>

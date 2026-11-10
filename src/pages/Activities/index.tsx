@@ -27,16 +27,16 @@ import { useActivities, useActivityMutation, type Activity } from "../../hooks/u
 import { confirmDelete } from "../../utils/swal";
 
 const MODAL_CLASSES = {
-  base: "bg-zinc-900/80 border border-white/10 shadow-2xl backdrop-blur-2xl",
-  header: "border-b border-white/5 px-8 pt-8 pb-6",
+  base: "bg-surface/80 border border-border shadow-2xl ",
+  header: "border-b border-border px-8 pt-8 pb-6",
   body: "px-8 py-6",
-  footer: "border-t border-white/5 px-8 pb-8 pt-6 gap-3",
+  footer: "border-t border-border px-8 pb-8 pt-6 gap-3",
 };
 
 const INPUT_CLASSES = {
-  label: "text-zinc-400 font-medium pb-5",
-  input: "text-white",
-  inputWrapper: "border-white/10 hover:border-white/20 focus-within:!border-blue-500/60 bg-white/5",
+  label: "text-muted font-medium pb-5",
+  input: "text-foreground",
+  inputWrapper: "border-border hover:border-white/20 focus-within:!border-blue-500/60 bg-surface",
 };
 
 const DEFAULT_FORM = { name: "", category: "", location: "", description: "", price: 0, duration: "", photos: "" };
@@ -106,28 +106,28 @@ const ActivitiesPage = () => {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold text-white tracking-tight">Activities Catalog</h1>
-          <p className="text-zinc-500">Manage tours and experiences (golf, diving, island hopping, etc).</p>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Activities Catalog</h1>
+          <p className="text-muted">Manage tours and experiences (golf, diving, island hopping, etc).</p>
         </div>
         <Button onPress={handleOpenAdd} variant="shadow" startContent={<Plus size={18} />} className="bg-blue-600 text-white font-bold h-12 px-6 shadow-blue-600/20">
           Add Activity
         </Button>
       </div>
 
-      <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-2xl">
+      <div className="flex items-center gap-4 bg-surface p-4 rounded-2xl border border-border ">
         <Input
           placeholder="Search by name..."
           value={search}
           onValueChange={setSearch}
-          startContent={<Search className="text-zinc-500" size={18} />}
+          startContent={<Search className="text-muted" size={18} />}
           className="max-w-md"
           variant="bordered"
-          classNames={{ input: "text-white", inputWrapper: "border-white/5 hover:border-white/10 focus-within:!border-blue-500/50 bg-white/5" }}
+          classNames={{ input: "text-foreground", inputWrapper: "border-border hover:border-border focus-within:!border-blue-500/50 bg-surface" }}
         />
-        <span className="text-xs text-zinc-600 ml-auto">{filtered.length} activities</span>
+        <span className="text-xs text-muted ml-auto">{filtered.length} activities</span>
       </div>
 
-      <Card className="bg-white/5 border border-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden">
+      <Card className="bg-surface border border-border shadow-2xl overflow-hidden">
         <CardBody className="p-0">
           <Table
             aria-label="Activities catalog"
@@ -135,8 +135,8 @@ const ActivitiesPage = () => {
             classNames={{
               base: "max-h-[700px]",
               table: "min-h-[400px]",
-              th: "bg-white/5 text-zinc-400 border-b border-white/5 py-5 uppercase text-xs font-bold tracking-wider",
-              td: "py-4 text-zinc-300 border-b border-white/5 last:border-0",
+              th: "bg-surface text-muted border-b border-border py-5 uppercase text-xs font-bold tracking-wider",
+              td: "py-4 text-foreground border-b border-border last:border-0",
             }}
           >
             <TableHeader>
@@ -148,26 +148,26 @@ const ActivitiesPage = () => {
             </TableHeader>
             <TableBody emptyContent={isLoading ? <Spinner color="primary" /> : "No activities yet"} items={filtered}>
               {(activity: Activity) => (
-                <TableRow key={activity.id} className="hover:bg-white/5 transition-colors">
+                <TableRow key={activity.id} className="hover:bg-surface-hover transition-colors">
                   <TableCell>
                     <div className="flex flex-col">
-                      <span className="font-bold text-white tracking-tight">{activity.name}</span>
-                      <span className="text-[11px] text-zinc-600">{activity.location}</span>
+                      <span className="font-bold text-foreground tracking-tight">{activity.name}</span>
+                      <span className="text-[11px] text-muted">{activity.location}</span>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Chip size="sm" variant="flat" className="bg-white/5 border border-white/10 text-zinc-300">
+                    <Chip size="sm" variant="flat" className="bg-surface border border-border text-foreground">
                       {activity.category}
                     </Chip>
                   </TableCell>
-                  <TableCell className="text-zinc-400">{activity.duration || "-"}</TableCell>
+                  <TableCell className="text-muted">{activity.duration || "-"}</TableCell>
                   <TableCell>
                     <span className="font-bold text-[#00D5FF]">Rp {Number(activity.price).toLocaleString("id-ID")}</span>
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center justify-center gap-2">
                       <Tooltip content="Edit" showArrow>
-                        <Button isIconOnly size="sm" variant="flat" className="bg-white/5 text-zinc-400 hover:text-amber-400 hover:bg-amber-500/10 border border-white/5" onPress={() => handleOpenEdit(activity)}>
+                        <Button isIconOnly size="sm" variant="flat" className="bg-surface text-muted hover:text-amber-400 hover:bg-amber-500/10 border border-border" onPress={() => handleOpenEdit(activity)}>
                           <Edit2 size={15} />
                         </Button>
                       </Tooltip>
@@ -191,8 +191,8 @@ const ActivitiesPage = () => {
             <>
               <ModalHeader>
                 <div>
-                  <h2 className="text-xl font-bold text-white">{editing ? "Edit Activity" : "Add Activity"}</h2>
-                  <p className="text-sm text-zinc-500 font-normal mt-0.5">Shown to travelers browsing experiences.</p>
+                  <h2 className="text-xl font-bold text-foreground">{editing ? "Edit Activity" : "Add Activity"}</h2>
+                  <p className="text-sm text-muted font-normal mt-0.5">Shown to travelers browsing experiences.</p>
                 </div>
               </ModalHeader>
               <ModalBody>
@@ -217,7 +217,7 @@ const ActivitiesPage = () => {
                 <Textarea label="Photo URLs (one per line)" variant="bordered" classNames={INPUT_CLASSES} className="mt-1" value={formState.photos} onValueChange={(v) => setFormState((p) => ({ ...p, photos: v }))} />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onCloseModal} className="text-zinc-400 bg-white/5 border border-white/10 flex-1 h-11">Cancel</Button>
+                <Button variant="flat" onPress={onCloseModal} className="text-muted bg-surface border border-border flex-1 h-11">Cancel</Button>
                 <Button className="bg-blue-600 text-white font-bold shadow-lg shadow-blue-600/20 flex-1 h-11" onPress={handleSubmit} isLoading={createActivity.isPending || updateActivity.isPending}>
                   {editing ? "Save Changes" : "Add Activity"}
                 </Button>

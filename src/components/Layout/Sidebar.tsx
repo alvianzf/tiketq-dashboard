@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { cn } from "../../lib/utils";
 import { useAuth } from "../../context/AuthContext";
+import LogoMark from "../Logo/Mark";
 
 interface Props {
   isOpen: boolean;
@@ -52,33 +53,31 @@ const Sidebar = ({ isOpen, onClose }: Props) => {
   return (
     <aside className={cn(
       "fixed lg:relative inset-y-0 left-0 z-30",
-      "w-72 bg-zinc-950/95 lg:bg-zinc-950/40 border-r border-white/5 backdrop-blur-2xl flex flex-col p-6 h-screen",
+      "w-72 bg-sidebar border-r border-border flex flex-col p-6 h-screen",
       "transition-transform duration-300 ease-in-out",
       "lg:translate-x-0",
       isOpen ? "translate-x-0" : "-translate-x-full"
     )}>
       <div className="flex items-center gap-3 px-2 mb-10">
-        <div className="w-10 h-10 bg-gradient-to-tr from-[#4267B2] to-[#00D5FF] rounded-xl flex items-center justify-center font-bold text-xl shadow-lg shadow-blue-500/20 shrink-0">
-          TQ
-        </div>
+        <LogoMark className="h-10 w-10 shrink-0 shadow-lg shadow-brand/20" />
         <div className="flex flex-col flex-1">
-          <span className="text-xl font-bold text-white tracking-tight">
+          <span className="text-xl font-bold text-sidebar-foreground tracking-tight">
             TiketQ Hub
           </span>
-          <span className="text-[10px] text-zinc-500 font-mono uppercase tracking-widest bg-zinc-900/50 px-1.5 py-0.5 rounded border border-white/5 w-fit mt-1">
+          <span className="text-[10px] text-muted font-mono uppercase tracking-widest bg-surface-hover px-1.5 py-0.5 rounded border border-border w-fit mt-1">
             Admin Panel
           </span>
         </div>
         <button
           onClick={onClose}
-          className="lg:hidden p-1.5 rounded-lg text-zinc-500 hover:text-white hover:bg-white/5 transition-colors"
+          className="lg:hidden p-1.5 rounded-lg text-muted hover:text-sidebar-foreground hover:bg-surface-hover transition-colors"
           aria-label="Close menu"
         >
           <X size={18} />
         </button>
       </div>
 
-      <nav className="flex-1 space-y-1.5">
+      <nav className="flex-1 space-y-1.5 overflow-y-auto">
         {menuItems.map((item) => {
           const isActive = pathname === item.path;
           return (
@@ -87,42 +86,40 @@ const Sidebar = ({ isOpen, onClose }: Props) => {
               to={item.path}
               onClick={handleNavigate}
               className={cn(
-                "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-300 group relative overflow-hidden",
-                isActive 
-                  ? "bg-white/10 text-white shadow-[inset_0_1px_1px_rgba(255,255,255,0.1)] border border-white/10" 
-                  : "text-zinc-500 hover:text-zinc-200 hover:bg-white/5 border border-transparent"
+                "flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 group relative overflow-hidden",
+                isActive
+                  ? "bg-brand/10 text-brand border border-brand/20"
+                  : "text-muted hover:text-sidebar-foreground hover:bg-surface-hover border border-transparent"
               )}
             >
-              <item.icon size={18} className={cn(
-                isActive ? "text-[#00D5FF]" : "group-hover:text-zinc-200"
-              )} />
+              <item.icon size={18} className={cn(isActive ? "text-brand" : "group-hover:text-sidebar-foreground")} />
               <span className="font-medium text-sm">{item.name}</span>
               {isActive && (
-                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#00D5FF] shadow-[0_0_8px_#00D5FF]" />
+                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-brand shadow-[0_0_8px_var(--primary)]" />
               )}
             </Link>
           );
         })}
       </nav>
 
-      <div className="pt-6 border-t border-white/5 space-y-2">
-        <div className="px-4 py-3 mb-2 flex items-center gap-3 bg-white/5 rounded-xl border border-white/5">
-          <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500 font-bold text-xs border border-blue-500/20">
+      <div className="pt-6 border-t border-border space-y-2">
+        <div className="px-4 py-3 mb-2 flex items-center gap-3 bg-surface-hover rounded-xl border border-border">
+          <div className="w-8 h-8 rounded-full bg-brand/15 flex items-center justify-center text-brand font-bold text-xs border border-brand/20 shrink-0">
             {user?.username?.charAt(0).toUpperCase()}
           </div>
           <div className="flex flex-col overflow-hidden">
-            <span className="text-sm font-medium text-white truncate">{user?.username}</span>
-            <span className="text-[10px] text-zinc-500 truncate">Administrator</span>
+            <span className="text-sm font-medium text-sidebar-foreground truncate">{user?.username}</span>
+            <span className="text-[10px] text-muted truncate">Administrator</span>
           </div>
         </div>
-        
-        <button className="w-full flex items-center gap-3 px-4 py-3 text-zinc-500 hover:text-zinc-200 hover:bg-white/5 rounded-xl transition-all text-sm font-medium">
+
+        <button className="w-full flex items-center gap-3 px-4 py-3 text-muted hover:text-sidebar-foreground hover:bg-surface-hover rounded-xl transition-all text-sm font-medium">
           <Settings size={18} />
           <span>Settings</span>
         </button>
-        <button 
+        <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 text-red-400/80 hover:text-red-400 hover:bg-red-400/5 rounded-xl transition-all text-sm font-medium"
+          className="w-full flex items-center gap-3 px-4 py-3 text-red-500/80 hover:text-red-500 hover:bg-red-500/5 rounded-xl transition-all text-sm font-medium"
         >
           <LogOut size={18} />
           <span>Sign Out</span>

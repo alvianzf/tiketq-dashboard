@@ -46,16 +46,16 @@ const CAR_FEATURES = [
 ];
 
 const MODAL_CLASSES = {
-  base: "bg-zinc-900/80 border border-white/10 shadow-2xl backdrop-blur-2xl",
-  header: "border-b border-white/5 px-8 pt-8 pb-6",
+  base: "bg-surface/80 border border-border shadow-2xl ",
+  header: "border-b border-border px-8 pt-8 pb-6",
   body: "px-8 py-6",
-  footer: "border-t border-white/5 px-8 pb-8 pt-6 gap-3",
+  footer: "border-t border-border px-8 pb-8 pt-6 gap-3",
 };
 
 const INPUT_CLASSES = {
-  label: "text-zinc-400 font-medium pb-5",
-  input: "text-white",
-  inputWrapper: "border-white/10 hover:border-white/20 focus-within:!border-blue-500/60 bg-white/5",
+  label: "text-muted font-medium pb-5",
+  input: "text-foreground",
+  inputWrapper: "border-border hover:border-white/20 focus-within:!border-blue-500/60 bg-surface",
 };
 
 const CarRentalPage = () => {
@@ -232,8 +232,8 @@ const CarRentalPage = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold text-white tracking-tight">Car Rental Inventory</h1>
-          <p className="text-zinc-500">Manage your fleet, pricing, and availability.</p>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Car Rental Inventory</h1>
+          <p className="text-muted">Manage your fleet, pricing, and availability.</p>
         </div>
         <Button
           onPress={handleOpenAdd}
@@ -246,24 +246,24 @@ const CarRentalPage = () => {
       </div>
 
       {/* Search Bar */}
-      <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-2xl">
+      <div className="flex items-center gap-4 bg-surface p-4 rounded-2xl border border-border ">
         <Input
           placeholder="Search by car name..."
           value={search}
           onValueChange={setSearch}
-          startContent={<Search className="text-zinc-500" size={18} />}
+          startContent={<Search className="text-muted" size={18} />}
           className="max-w-md"
           variant="bordered"
           classNames={{
-            input: "text-white",
-            inputWrapper: "border-white/5 hover:border-white/10 focus-within:!border-blue-500/50 bg-white/5",
+            input: "text-foreground",
+            inputWrapper: "border-border hover:border-border focus-within:!border-blue-500/50 bg-surface",
           }}
         />
-        <span className="text-xs text-zinc-600 ml-auto">{filtered.length} vehicles</span>
+        <span className="text-xs text-muted ml-auto">{filtered.length} vehicles</span>
       </div>
 
       {/* Table */}
-      <Card className="bg-white/5 border border-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden">
+      <Card className="bg-surface border border-border shadow-2xl overflow-hidden">
         <CardBody className="p-0">
           <Table
             aria-label="Car rental inventory"
@@ -271,8 +271,8 @@ const CarRentalPage = () => {
             classNames={{
               base: "max-h-[700px]",
               table: "min-h-[400px]",
-              th: "bg-white/5 text-zinc-400 border-b border-white/5 py-5 uppercase text-xs font-bold tracking-wider",
-              td: "py-4 text-zinc-300 border-b border-white/5 last:border-0",
+              th: "bg-surface text-muted border-b border-border py-5 uppercase text-xs font-bold tracking-wider",
+              td: "py-4 text-foreground border-b border-border last:border-0",
             }}
           >
             <TableHeader>
@@ -288,10 +288,10 @@ const CarRentalPage = () => {
               items={filtered}
             >
               {(car: Car) => (
-                <TableRow key={car.id} className="hover:bg-white/5 transition-colors">
+                <TableRow key={car.id} className="hover:bg-surface-hover transition-colors">
                   <TableCell>
                     <div className="flex items-center gap-4">
-                      <div className="relative overflow-hidden rounded-xl border border-white/10">
+                      <div className="relative overflow-hidden rounded-xl border border-border">
                         <Image
                           src={car.photos?.[0]?.url || "https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=160&q=80"}
                           width={72}
@@ -300,25 +300,25 @@ const CarRentalPage = () => {
                         />
                       </div>
                       <div className="flex flex-col">
-                        <span className="font-bold text-white tracking-tight">{car.name}</span>
-                        <span className="text-[11px] text-zinc-600 font-mono">#{car.id}</span>
+                        <span className="font-bold text-foreground tracking-tight">{car.name}</span>
+                        <span className="text-[11px] text-muted font-mono">#{car.id}</span>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Chip size="sm" variant="flat" className="bg-white/5 border border-white/10 text-zinc-300">
+                    <Chip size="sm" variant="flat" className="bg-surface border border-border text-foreground">
                       {car.type}
                     </Chip>
                   </TableCell>
-                  <TableCell className="text-zinc-400">{car.rows} rows</TableCell>
+                  <TableCell className="text-muted">{car.rows} rows</TableCell>
                   <TableCell>
                     <div className="flex flex-col">
                       <span className="font-bold text-[#00D5FF]">Rp {Number(car.pricePerDay).toLocaleString("id-ID")}</span>
-                      <span className="text-[10px] text-zinc-600 uppercase tracking-wider">per {car.pricingDuration || 'Hari'}</span>
+                      <span className="text-[10px] text-muted uppercase tracking-wider">per {car.pricingDuration || 'Hari'}</span>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold border ${car.available ? "bg-green-500/10 text-green-400 border-green-500/20" : "bg-zinc-500/10 text-zinc-500 border-white/5"}`}>
+                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold border ${car.available ? "bg-green-500/10 text-green-400 border-green-500/20" : "bg-zinc-500/10 text-muted border-border"}`}>
                       <div className={`w-1.5 h-1.5 rounded-full ${car.available ? "bg-green-400 shadow-[0_0_6px_#4ade80]" : "bg-zinc-500"}`} />
                       {car.available ? "Available" : "Booked"}
                     </div>
@@ -328,7 +328,7 @@ const CarRentalPage = () => {
                       <Tooltip content="Edit car" showArrow>
                         <Button 
                           isIconOnly size="sm" variant="flat" 
-                          className="bg-white/5 text-zinc-400 hover:text-amber-400 hover:bg-amber-500/10 border border-white/5"
+                          className="bg-surface text-muted hover:text-amber-400 hover:bg-amber-500/10 border border-border"
                           onPress={() => handleOpenEdit(car)}
                         >
                           <Edit2 size={15} />
@@ -372,8 +372,8 @@ const CarRentalPage = () => {
                     <CarIcon size={20} className="text-blue-400" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white">{editingCar ? "Edit Vehicle" : "Add New Car"}</h2>
-                    <p className="text-sm text-zinc-500 font-normal mt-0.5">{editingCar ? "Update the vehicle information." : "Fill in the vehicle details below."}</p>
+                    <h2 className="text-xl font-bold text-foreground">{editingCar ? "Edit Vehicle" : "Add New Car"}</h2>
+                    <p className="text-sm text-muted font-normal mt-0.5">{editingCar ? "Update the vehicle information." : "Fill in the vehicle details below."}</p>
                   </div>
                 </div>
               </ModalHeader>
@@ -393,18 +393,18 @@ const CarRentalPage = () => {
                     placeholder="Select type"
                     variant="bordered"
                     classNames={{
-                      label: "text-zinc-400 font-medium pb-5",
-                      value: "text-white",
-                      trigger: "border-white/10 hover:border-white/20 bg-white/5",
+                      label: "text-muted font-medium pb-5",
+                      value: "text-foreground",
+                      trigger: "border-border hover:border-white/20 bg-surface",
                     }}
                     popoverProps={{
                       classNames: {
-                        base: "bg-zinc-900 border border-white/10 backdrop-blur-2xl shadow-2xl",
+                        base: "bg-surface border border-border  shadow-2xl",
                       }
                     }}
                     listboxProps={{
                       itemClasses: {
-                        base: "text-white data-[hover=true]:bg-white/10 data-[selectable=true]:focus:bg-white/10",
+                        base: "text-foreground data-[hover=true]:bg-surface-hover data-[selectable=true]:focus:bg-surface-hover",
                       }
                     }}
                     selectedKeys={formState.type ? [formState.type] : []}
@@ -432,18 +432,18 @@ const CarRentalPage = () => {
                     placeholder="Select duration"
                     variant="bordered"
                     classNames={{
-                      label: "text-zinc-400 font-medium pb-5",
-                      value: "text-white",
-                      trigger: "border-white/10 hover:border-white/20 bg-white/5",
+                      label: "text-muted font-medium pb-5",
+                      value: "text-foreground",
+                      trigger: "border-border hover:border-white/20 bg-surface",
                     }}
                     popoverProps={{
                       classNames: {
-                        base: "bg-zinc-900 border border-white/10 backdrop-blur-2xl shadow-2xl",
+                        base: "bg-surface border border-border  shadow-2xl",
                       }
                     }}
                     listboxProps={{
                       itemClasses: {
-                        base: "text-white data-[hover=true]:bg-white/10 data-[selectable=true]:focus:bg-white/10",
+                        base: "text-foreground data-[hover=true]:bg-surface-hover data-[selectable=true]:focus:bg-surface-hover",
                       }
                     }}
                     selectedKeys={formState.pricingDuration ? [formState.pricingDuration] : []}
@@ -466,21 +466,21 @@ const CarRentalPage = () => {
                     onValueChange={(v) => setFormState((p) => ({ ...p, rows: Number(v) }))}
                   />
                   <div className="flex flex-col gap-2">
-                    <label className="text-zinc-400 font-medium pb-1.5 text-sm">Transmission</label>
+                    <label className="text-muted font-medium pb-1.5 text-sm">Transmission</label>
                     <RadioGroup
                         orientation="horizontal"
                         value={formState.transmission}
                         onValueChange={(v) => setFormState((p) => ({ ...p, transmission: v }))}
                         classNames={{ wrapper: "gap-6" }}
                     >
-                        <Radio value="Automatic" classNames={{ label: "text-zinc-300" }}>Automatic</Radio>
-                        <Radio value="Manual" classNames={{ label: "text-zinc-300" }}>Manual</Radio>
+                        <Radio value="Automatic" classNames={{ label: "text-foreground" }}>Automatic</Radio>
+                        <Radio value="Manual" classNames={{ label: "text-foreground" }}>Manual</Radio>
                     </RadioGroup>
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-2 mt-4">
-                  <label className="text-zinc-400 font-medium text-sm">Fasilitas & Fitur</label>
+                  <label className="text-muted font-medium text-sm">Fasilitas & Fitur</label>
                   <CheckboxGroup
                     orientation="horizontal"
                     value={formState.features}
@@ -488,7 +488,7 @@ const CarRentalPage = () => {
                     classNames={{ wrapper: "gap-4 grid grid-cols-3" }}
                   >
                     {CAR_FEATURES.map((feature) => (
-                      <Checkbox key={feature.value} value={feature.value} classNames={{ label: "text-zinc-300 text-sm" }}>
+                      <Checkbox key={feature.value} value={feature.value} classNames={{ label: "text-foreground text-sm" }}>
                         <span className="mr-1">{feature.icon}</span> {feature.label}
                       </Checkbox>
                     ))}
@@ -496,13 +496,13 @@ const CarRentalPage = () => {
                 </div>
 
                 <div className="flex flex-col gap-2 mt-2">
-                  <label className="text-zinc-400 font-medium text-sm">Vehicle Description</label>
-                  <div className="bg-zinc-800/50 rounded-xl border border-white/10 overflow-hidden">
+                  <label className="text-muted font-medium text-sm">Vehicle Description</label>
+                  <div className="bg-surface-hover rounded-xl border border-border overflow-hidden">
                     <ReactQuill 
                       theme="snow" 
                       value={formState.description} 
                       onChange={(v) => setFormState(p => ({ ...p, description: v }))}
-                      className="text-white h-[180px] mb-12"
+                      className="text-foreground h-[180px] mb-12"
                     />
                   </div>
                 </div>
@@ -511,7 +511,7 @@ const CarRentalPage = () => {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Camera size={18} className="text-blue-400" />
-                      <h3 className="text-white font-bold">Vehicle Gallery</h3>
+                      <h3 className="text-foreground font-bold">Vehicle Gallery</h3>
                     </div>
                     <div className="flex items-center gap-2">
                       {selectedExistingPhotoIds.length > 0 && (
@@ -556,7 +556,7 @@ const CarRentalPage = () => {
                           <div 
                             key={photo.id} 
                             onClick={() => togglePhotoSelection(photo.id)}
-                            className={`relative group aspect-video rounded-xl overflow-hidden border transition-all cursor-pointer ${isSelected ? 'border-blue-500 ring-2 ring-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.5)]' : 'border-white/10 hover:border-white/30 bg-white/5'}`}
+                            className={`relative group aspect-video rounded-xl overflow-hidden border transition-all cursor-pointer ${isSelected ? 'border-blue-500 ring-2 ring-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.5)]' : 'border-border hover:border-white/30 bg-surface'}`}
                           >
                             <Image src={photo.url} className="object-cover w-full h-full" />
                             {isSelected && (
@@ -586,16 +586,16 @@ const CarRentalPage = () => {
                   {/* New Selected Photos */}
                   {photoPreviews.length > 0 && (
                     <div className="space-y-2">
-                      <p className="text-xs text-zinc-500 uppercase font-bold">Newly Selected</p>
+                      <p className="text-xs text-muted uppercase font-bold">Newly Selected</p>
                       <div className="grid grid-cols-4 gap-3">
                         {photoPreviews.map((url, i) => (
                           <div key={i} className="relative group aspect-video rounded-xl overflow-hidden border border-blue-500/30 bg-blue-500/5">
                             <Image src={url} className="object-cover w-full h-full" />
                             <button 
                               onClick={() => removeSelectedPhoto(i)}
-                              className="absolute top-1 right-1 p-1 bg-zinc-900/80 rounded-lg"
+                              className="absolute top-1 right-1 p-1 bg-surface/80 rounded-lg"
                             >
-                              <X size={12} className="text-white" />
+                              <X size={12} className="text-foreground" />
                             </button>
                           </div>
                         ))}
@@ -606,7 +606,7 @@ const CarRentalPage = () => {
               </ModalBody>
 
               <ModalFooter>
-                <Button variant="flat" onPress={onClose} className="text-zinc-400 bg-white/5 border border-white/10 flex-1 h-11">
+                <Button variant="flat" onPress={onClose} className="text-muted bg-surface border border-border flex-1 h-11">
                   Cancel
                 </Button>
                 <Button

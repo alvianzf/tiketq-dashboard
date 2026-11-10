@@ -27,16 +27,16 @@ import { useHotels, useHotelMutation, type Hotel } from "../../hooks/useAdmin";
 import { confirmDelete } from "../../utils/swal";
 
 const MODAL_CLASSES = {
-  base: "bg-zinc-900/80 border border-white/10 shadow-2xl backdrop-blur-2xl",
-  header: "border-b border-white/5 px-8 pt-8 pb-6",
+  base: "bg-surface/80 border border-border shadow-2xl ",
+  header: "border-b border-border px-8 pt-8 pb-6",
   body: "px-8 py-6",
-  footer: "border-t border-white/5 px-8 pb-8 pt-6 gap-3",
+  footer: "border-t border-border px-8 pb-8 pt-6 gap-3",
 };
 
 const INPUT_CLASSES = {
-  label: "text-zinc-400 font-medium pb-5",
-  input: "text-white",
-  inputWrapper: "border-white/10 hover:border-white/20 focus-within:!border-blue-500/60 bg-white/5",
+  label: "text-muted font-medium pb-5",
+  input: "text-foreground",
+  inputWrapper: "border-border hover:border-white/20 focus-within:!border-blue-500/60 bg-surface",
 };
 
 const DEFAULT_FORM = { name: "", location: "", description: "", pricePerNight: 0, amenities: "", photos: "" };
@@ -106,28 +106,28 @@ const HotelsPage = () => {
     <div className="space-y-8 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold text-white tracking-tight">Hotel Catalog</h1>
-          <p className="text-zinc-500">Manage stays offered through the concierge platform.</p>
+          <h1 className="text-3xl font-bold text-foreground tracking-tight">Hotel Catalog</h1>
+          <p className="text-muted">Manage stays offered through the concierge platform.</p>
         </div>
         <Button onPress={handleOpenAdd} variant="shadow" startContent={<Plus size={18} />} className="bg-blue-600 text-white font-bold h-12 px-6 shadow-blue-600/20">
           Add Hotel
         </Button>
       </div>
 
-      <div className="flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-2xl">
+      <div className="flex items-center gap-4 bg-surface p-4 rounded-2xl border border-border ">
         <Input
           placeholder="Search by name..."
           value={search}
           onValueChange={setSearch}
-          startContent={<Search className="text-zinc-500" size={18} />}
+          startContent={<Search className="text-muted" size={18} />}
           className="max-w-md"
           variant="bordered"
-          classNames={{ input: "text-white", inputWrapper: "border-white/5 hover:border-white/10 focus-within:!border-blue-500/50 bg-white/5" }}
+          classNames={{ input: "text-foreground", inputWrapper: "border-border hover:border-border focus-within:!border-blue-500/50 bg-surface" }}
         />
-        <span className="text-xs text-zinc-600 ml-auto">{filtered.length} hotels</span>
+        <span className="text-xs text-muted ml-auto">{filtered.length} hotels</span>
       </div>
 
-      <Card className="bg-white/5 border border-white/10 backdrop-blur-2xl shadow-2xl overflow-hidden">
+      <Card className="bg-surface border border-border shadow-2xl overflow-hidden">
         <CardBody className="p-0">
           <Table
             aria-label="Hotel catalog"
@@ -135,8 +135,8 @@ const HotelsPage = () => {
             classNames={{
               base: "max-h-[700px]",
               table: "min-h-[400px]",
-              th: "bg-white/5 text-zinc-400 border-b border-white/5 py-5 uppercase text-xs font-bold tracking-wider",
-              td: "py-4 text-zinc-300 border-b border-white/5 last:border-0",
+              th: "bg-surface text-muted border-b border-border py-5 uppercase text-xs font-bold tracking-wider",
+              td: "py-4 text-foreground border-b border-border last:border-0",
             }}
           >
             <TableHeader>
@@ -148,12 +148,12 @@ const HotelsPage = () => {
             </TableHeader>
             <TableBody emptyContent={isLoading ? <Spinner color="primary" /> : "No hotels yet"} items={filtered}>
               {(hotel: Hotel) => (
-                <TableRow key={hotel.id} className="hover:bg-white/5 transition-colors">
+                <TableRow key={hotel.id} className="hover:bg-surface-hover transition-colors">
                   <TableCell>
-                    <span className="font-bold text-white tracking-tight">{hotel.name}</span>
+                    <span className="font-bold text-foreground tracking-tight">{hotel.name}</span>
                   </TableCell>
                   <TableCell>
-                    <Chip size="sm" variant="flat" startContent={<MapPin size={12} />} className="bg-white/5 border border-white/10 text-zinc-300">
+                    <Chip size="sm" variant="flat" startContent={<MapPin size={12} />} className="bg-surface border border-border text-foreground">
                       {hotel.location}
                     </Chip>
                   </TableCell>
@@ -161,7 +161,7 @@ const HotelsPage = () => {
                     <span className="font-bold text-[#00D5FF]">Rp {Number(hotel.pricePerNight).toLocaleString("id-ID")}</span>
                   </TableCell>
                   <TableCell>
-                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold border ${hotel.available ? "bg-green-500/10 text-green-400 border-green-500/20" : "bg-zinc-500/10 text-zinc-500 border-white/5"}`}>
+                    <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold border ${hotel.available ? "bg-green-500/10 text-green-400 border-green-500/20" : "bg-zinc-500/10 text-muted border-border"}`}>
                       <div className={`w-1.5 h-1.5 rounded-full ${hotel.available ? "bg-green-400 shadow-[0_0_6px_#4ade80]" : "bg-zinc-500"}`} />
                       {hotel.available ? "Available" : "Unavailable"}
                     </div>
@@ -169,7 +169,7 @@ const HotelsPage = () => {
                   <TableCell>
                     <div className="flex items-center justify-center gap-2">
                       <Tooltip content="Edit" showArrow>
-                        <Button isIconOnly size="sm" variant="flat" className="bg-white/5 text-zinc-400 hover:text-amber-400 hover:bg-amber-500/10 border border-white/5" onPress={() => handleOpenEdit(hotel)}>
+                        <Button isIconOnly size="sm" variant="flat" className="bg-surface text-muted hover:text-amber-400 hover:bg-amber-500/10 border border-border" onPress={() => handleOpenEdit(hotel)}>
                           <Edit2 size={15} />
                         </Button>
                       </Tooltip>
@@ -193,8 +193,8 @@ const HotelsPage = () => {
             <>
               <ModalHeader>
                 <div>
-                  <h2 className="text-xl font-bold text-white">{editing ? "Edit Hotel" : "Add Hotel"}</h2>
-                  <p className="text-sm text-zinc-500 font-normal mt-0.5">Shown to travelers booking a stay.</p>
+                  <h2 className="text-xl font-bold text-foreground">{editing ? "Edit Hotel" : "Add Hotel"}</h2>
+                  <p className="text-sm text-muted font-normal mt-0.5">Shown to travelers booking a stay.</p>
                 </div>
               </ModalHeader>
               <ModalBody>
@@ -218,7 +218,7 @@ const HotelsPage = () => {
                 <Textarea label="Photo URLs (one per line)" variant="bordered" classNames={INPUT_CLASSES} className="mt-1" value={formState.photos} onValueChange={(v) => setFormState((p) => ({ ...p, photos: v }))} />
               </ModalBody>
               <ModalFooter>
-                <Button variant="flat" onPress={onCloseModal} className="text-zinc-400 bg-white/5 border border-white/10 flex-1 h-11">Cancel</Button>
+                <Button variant="flat" onPress={onCloseModal} className="text-muted bg-surface border border-border flex-1 h-11">Cancel</Button>
                 <Button className="bg-blue-600 text-white font-bold shadow-lg shadow-blue-600/20 flex-1 h-11" onPress={handleSubmit} isLoading={createHotel.isPending || updateHotel.isPending}>
                   {editing ? "Save Changes" : "Add Hotel"}
                 </Button>
