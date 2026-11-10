@@ -342,11 +342,11 @@ const ServerManager = () => {
   const breadcrumbItems = currentPath.split("/").filter(p => p);
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 pb-20 mt-4 px-4 overflow-x-hidden max-w-[1600px] mx-auto">
+    <div className="space-y-6 animate-in fade-in duration-500 pb-20 mt-4 px-4 overflow-x-hidden max-w-[1600px] mx-auto">
       <div className="flex flex-col gap-1">
         <div className="flex items-center gap-2">
           <ShieldCheck className="text-blue-400" size={24} />
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Infrastructure Hub</h1>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Infrastructure Hub</h1>
         </div>
         <div className="flex items-center gap-2 text-muted">
            <History size={14} className="text-orange-400/70" />

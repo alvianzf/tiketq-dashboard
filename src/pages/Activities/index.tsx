@@ -103,10 +103,10 @@ const ActivitiesPage = () => {
   const filtered = (activities || []).filter((a: Activity) => a.name.toLowerCase().includes(search.toLowerCase()));
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold text-foreground tracking-tight">Activities Catalog</h1>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">Activities Catalog</h1>
           <p className="text-muted">Manage tours and experiences (golf, diving, island hopping, etc).</p>
         </div>
         <Button onPress={handleOpenAdd} variant="shadow" startContent={<Plus size={18} />} className="bg-blue-600 text-white font-bold h-12 px-6 shadow-blue-600/20">
@@ -135,8 +135,8 @@ const ActivitiesPage = () => {
             classNames={{
               base: "max-h-[700px]",
               table: "min-h-[400px]",
-              th: "bg-surface text-muted border-b border-border py-5 uppercase text-xs font-bold tracking-wider",
-              td: "py-4 text-foreground border-b border-border last:border-0",
+              th: "bg-surface text-muted border-b border-border py-2.5 uppercase text-xs font-bold tracking-wider",
+              td: "py-2 text-foreground border-b border-border last:border-0",
             }}
           >
             <TableHeader>

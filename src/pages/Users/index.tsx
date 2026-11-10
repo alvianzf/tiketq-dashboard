@@ -295,11 +295,11 @@ const UsersPage = () => {
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in fade-in duration-500">
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold text-foreground">User Management</h1>
+          <h1 className="text-2xl font-bold text-foreground">User Management</h1>
           <p className="text-muted">Manage administrative accounts and system access.</p>
         </div>
         <Button
@@ -337,8 +337,8 @@ const UsersPage = () => {
             removeWrapper
             classNames={{
               base: "max-h-[600px] overflow-scroll",
-              th: "bg-surface text-muted border-b border-border py-4 font-bold uppercase text-xs tracking-wider",
-              td: "py-4 text-foreground border-b border-border last:border-0",
+              th: "bg-surface text-muted border-b border-border py-2.5 font-bold uppercase text-xs tracking-wider",
+              td: "py-2 text-foreground border-b border-border last:border-0",
             }}
           >
             <TableHeader>

@@ -125,12 +125,12 @@ const LogsPage = () => {
   const filteredLines = processLogLines();
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500 pb-20 max-w-[1600px] mx-auto px-4 mt-4">
+    <div className="space-y-6 animate-in fade-in duration-500 pb-20 max-w-[1600px] mx-auto px-4 mt-4">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <Terminal className="text-[#00D5FF]" size={24} />
-            <h1 className="text-3xl font-bold text-foreground tracking-tight">System & Audit Logs</h1>
+            <h1 className="text-2xl font-bold text-foreground tracking-tight">System & Audit Logs</h1>
           </div>
           <p className="text-muted text-sm">Monitor real-time server process stdout stream and transaction event history.</p>
         </div>

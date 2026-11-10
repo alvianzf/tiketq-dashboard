@@ -98,42 +98,40 @@ const DashboardPage = () => {
   const chartData = statsData?.chartData || [];
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-6 animate-in fade-in duration-500">
       <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold text-foreground">Overview</h1>
-        <p className="text-muted">Welcome back, Admin. Here's what's happening today.</p>
+        <h1 className="text-2xl font-bold text-foreground">Overview</h1>
+        <p className="text-muted text-sm">Welcome back, Admin. Here's what's happening today.</p>
       </div>
 
       {/* System Health Section */}
       <SystemHealth />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+      {/* Compact inline stat strip — one row, dividers instead of separate cards */}
+      <div className="surface-card flex flex-col sm:flex-row divide-y sm:divide-y-0 sm:divide-x divide-border overflow-hidden">
         {stats.map((stat, i) => (
-          <Card key={i} className="bg-surface border-border shadow-2xl hover:translate-y-[-4px] transition-all duration-300 group overflow-hidden relative">
-            <div className="absolute top-0 right-0 w-24 h-24 bg-surface blur-3xl rounded-full -mr-12 -mt-12 group-hover:bg-blue-500/10 transition-colors" />
-            <CardBody className="p-6">
-              <div className="flex items-center justify-between mb-6">
-                <div className={`p-3 rounded-2xl bg-surface border border-border shadow-inner ${stat.color}`}>
-                  <stat.icon size={22} />
-                </div>
-                <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold ${stat.trend === "up" ? "bg-green-500/10 text-green-400 border border-green-500/10" : "bg-red-500/10 text-red-400 border border-red-500/10"}`}>
+          <div key={i} className="flex-1 flex items-center gap-3 px-5 py-4 min-w-0">
+            <div className={`p-2 rounded-xl bg-surface-hover shrink-0 ${stat.color}`}>
+              <stat.icon size={16} />
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-muted text-[10px] font-semibold uppercase tracking-wider truncate">{stat.title}</p>
+              <div className="flex items-baseline gap-1.5">
+                <h3 className="text-lg font-bold text-foreground tracking-tight truncate">{stat.value}</h3>
+                <span className={`flex items-center gap-0.5 text-[10px] font-bold shrink-0 ${stat.trend === "up" ? "text-green-500" : "text-red-500"}`}>
+                  {stat.trend === "up" ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
                   {stat.change}
-                  {stat.trend === "up" ? <ArrowUpRight size={12} /> : <ArrowDownRight size={12} />}
-                </div>
+                </span>
               </div>
-              <div className="space-y-1">
-                <p className="text-muted text-xs font-semibold uppercase tracking-wider">{stat.title}</p>
-                <h3 className="text-3xl font-bold text-foreground tracking-tight">{stat.value}</h3>
-              </div>
-            </CardBody>
-          </Card>
+            </div>
+          </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <Card className="lg:col-span-2 bg-surface border-border shadow-2xl overflow-hidden">
-          <CardBody className="p-8">
-            <div className="flex items-center justify-between mb-10">
+          <CardBody className="p-6">
+            <div className="flex items-center justify-between mb-6">
               <div className="flex flex-col gap-1">
                 <h3 className="text-xl font-bold text-foreground tracking-tight">Revenue Performance</h3>
                 <p className="text-muted text-sm">Monthly growth and volume trends</p>
@@ -143,7 +141,7 @@ const DashboardPage = () => {
                 <Button size="sm" variant="flat" className="text-muted text-xs font-bold">Annually</Button>
               </div>
             </div>
-            <div className="h-[350px] w-full">
+            <div className="h-[280px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <AreaChart data={chartData}>
                   <defs>
@@ -184,12 +182,12 @@ const DashboardPage = () => {
         </Card>
 
         <Card className="bg-surface border-border shadow-2xl">
-          <CardBody className="p-8">
-            <div className="flex flex-col gap-1 mb-10">
+          <CardBody className="p-6">
+            <div className="flex flex-col gap-1 mb-6">
               <h3 className="text-xl font-bold text-foreground tracking-tight">Transactions Volume</h3>
               <p className="text-muted text-sm">Activity distribution</p>
             </div>
-            <div className="h-[350px] w-full">
+            <div className="h-[280px] w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={gridColor} />

@@ -154,10 +154,10 @@ const TransactionsPage = () => {
   };
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-bottom-5 duration-500">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-5 duration-500">
       <div className="flex items-center justify-between">
         <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold text-foreground">Transactions</h1>
+          <h1 className="text-2xl font-bold text-foreground">Transactions</h1>
           <p className="text-muted">Monitor and manage all customer bookings.</p>
         </div>
         <Button 
@@ -194,8 +194,8 @@ const TransactionsPage = () => {
             classNames={{
               base: "max-h-[700px] overflow-scroll",
               table: "min-h-[400px]",
-              th: "bg-surface text-muted font-bold border-b border-border py-5",
-              td: "py-4 text-foreground border-b border-border",
+              th: "bg-surface text-muted font-bold border-b border-border py-2.5 text-[11px]",
+              td: "py-2 text-foreground border-b border-border text-sm",
             }}
           >
             <TableHeader>
@@ -217,12 +217,13 @@ const TransactionsPage = () => {
                       name={getCustomerName(transaction)}
                       description={transaction.email}
                       avatarProps={{
+                        size: "sm",
                         src: `https://api.dicebear.com/7.x/avataaars/svg?seed=${transaction.id}&backgroundColor=b6e3f4`,
-                        className: "border border-border shadow-lg"
+                        className: "border border-border"
                       }}
                       classNames={{
-                        name: "text-foreground font-semibold",
-                        description: "text-muted"
+                        name: "text-foreground font-semibold text-sm",
+                        description: "text-muted text-xs"
                       }}
                     />
                   </TableCell>

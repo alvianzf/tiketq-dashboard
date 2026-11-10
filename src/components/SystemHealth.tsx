@@ -6,7 +6,7 @@ const SystemHealth = () => {
   const { data: health, isLoading } = useHealth();
 
   if (isLoading) return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {[...Array(4)].map((_, i) => (
         <Card key={i} className="bg-surface border border-border animate-pulse">
           <CardBody className="p-6 h-[120px]" />
@@ -20,10 +20,10 @@ const SystemHealth = () => {
   const memPercent = health?.system?.memPercent ?? 0;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {/* Status Card */}
       <Card className={`border shadow-xl ${isOnline ? "bg-green-500/5 border-green-500/20" : "bg-red-500/5 border-red-500/20"}`}>
-        <CardBody className="p-6 gap-4">
+        <CardBody className="p-5 gap-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Activity size={18} className={isOnline ? "text-green-400" : "text-red-400"} />
@@ -56,7 +56,7 @@ const SystemHealth = () => {
 
       {/* CPU Card */}
       <Card className="bg-surface border border-border shadow-xl">
-        <CardBody className="p-6 gap-4">
+        <CardBody className="p-5 gap-3">
           <div className="flex items-center gap-2 text-muted">
             <Cpu size={18} />
             <span className="text-sm font-medium">CPU Load</span>
@@ -78,7 +78,7 @@ const SystemHealth = () => {
 
       {/* Memory Card */}
       <Card className="bg-surface border border-border shadow-xl">
-        <CardBody className="p-6 gap-4">
+        <CardBody className="p-5 gap-3">
           <div className="flex items-center gap-2 text-muted">
             <HardDrive size={18} />
             <span className="text-sm font-medium">Memory</span>
@@ -100,7 +100,7 @@ const SystemHealth = () => {
 
       {/* Uptime Card */}
       <Card className="bg-surface border border-border shadow-xl">
-        <CardBody className="p-6 gap-4">
+        <CardBody className="p-5 gap-3">
           <div className="flex items-center gap-2 text-muted">
             <Clock size={18} />
             <span className="text-sm font-medium">Server Uptime</span>
